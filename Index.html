@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cage Construction — Site Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Tokens ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root {
+  --void:      #0b0d10;
+  --surface-1: #111318;
+  --surface-2: #191c23;
+  --surface-3: #20242e;
+  --line:      rgba(255,255,255,0.07);
+  --line-mid:  rgba(255,255,255,0.12);
+  --text-1:    #f0f2f7;
+  --text-2:    #8b92a8;
+  --text-3:    #555e73;
+  --amber:     #e8a830;
+  --amber-dim: rgba(232,168,48,0.12);
+  --amber-glow:rgba(232,168,48,0.25);
+
+  /* Zone colours */
+  --z-scaffold: #3b82f6;
+  --z-scaffold-dim: rgba(59,130,246,0.12);
+  --z-spmt:     #a855f7;
+  --z-spmt-dim: rgba(168,85,247,0.12);
+  --z-final:    #22c55e;
+  --z-final-dim:rgba(34,197,94,0.12);
+  --z-unplaced: rgba(255,255,255,0.06);
+
+  --radius:    8px;
+  --radius-lg: 14px;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Syne', sans-serif;
+}
+
+html,body{height:100%;background:var(--void);color:var(--text-1);font-family:var(--sans);}
+body{display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--line-mid);border-radius:2px;}
+
+/* ── Header ── */
+.header{
+  background:var(--surface-1);
+  border-bottom:1px solid var(--line);
+  padding:0 28px;
+  height:58px;
+  display:flex;align-items:center;gap:16px;flex-shrink:0;
+}
+.header-mark{
+  width:36px;height:36px;border-radius:9px;
+  background:linear-gradient(135deg,var(--amber),#c08520);
+  display:flex;align-items:center;justify-content:center;
+  font:700 14px var(--mono);color:#1a1200;letter-spacing:-.02em;
+  flex-shrink:0;
+}
+.header-text{flex:1;}
+.header-title{font:700 16px var(--sans);color:var(--text-1);letter-spacing:-.03em;}
+.header-sub{font:400 10px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.12em;margin-top:1px;}
+.header-pill{
+  font:700 10px var(--mono);
+  padding:3px 10px;border-radius:20px;
+  background:var(--amber-dim);color:var(--amber);
+  border:1px solid var(--amber-glow);letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.api-indicator{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--text-3);transition:background .3s;
+  flex-shrink:0;
+}
+.api-indicator.ok{background:var(--z-final);}
+.api-indicator.err{background:#f87171;}
+
+/* ── Auth Screen ── */
+.auth-screen{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(232,168,48,.06),transparent);
+}
+.auth-card{
+  background:var(--surface-2);
+  border:1px solid var(--line-mid);
+  border-radius:var(--radius-lg);
+  padding:36px 40px;
+  width:100%;max-width:380px;
+  text-align:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+.auth-icon{font-size:36px;margin-bottom:14px;}
+.auth-title{font:700 22px var(--sans);letter-spacing:-.04em;margin-bottom:6px;}
+.auth-sub{font:400 12px var(--mono);color:var(--text-3);margin-bottom:28px;text-transform:uppercase;letter-spacing:.08em;}
+.auth-input{
+  background:var(--surface-3);border:1px solid var(--line-mid);border-radius:var(--radius);
+  padding:12px 16px;color:var(--text-1);font:700 20px var(--mono);letter-spacing:.3em;
+  text-align:center;width:100%;transition:border-color .2s;
+}
+.auth-input:focus{outline:none;border-color:var(--amber);}
+.auth-btn{
+  margin-top:14px;width:100%;padding:12px;border-radius:var(--radius);border:none;
+  background:linear-gradient(135deg,var(--amber),#c08520);
+  color:#1a1200;font:700 14px var(--sans);cursor:pointer;
+  transition:filter .15s;
+}
+.auth-btn:hover{filter:brightness(1.1);}
+.auth-err{margin-top:12px;font:400 12px var(--mono);color:#f87171;}
+.auth-api-row{margin-bottom:18px;}
+.auth-api-input{
+  background:var(--surface-3);border:1px solid var(--line);border-radius:var(--radius);
+  padding:9px 12px;color:var(--text-2);font:400 12px var(--mono);width:100%;
+}
+.auth-api-input:focus{outline:none;border-color:var(--amber);}
+.auth-api-label{font:700 10px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;text-align:left;display:block;margin-bottom:5px;}
+
+/* ── App Layout ── */
+.app{flex:1;display:flex;overflow:hidden;}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--surface-1);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sidebar-top{padding:18px 18px 12px;border-bottom:1px solid var(--line);}
+.sidebar-search{
+  background:var(--surface-3);border:1px solid var(--line);border-radius:var(--radius);
+  padding:8px 12px;color:var(--text-1);font:400 13px var(--sans);width:100%;
+  transition:border-color .15s;
+}
+.sidebar-search:focus{outline:none;border-color:var(--amber);}
+.sidebar-search::placeholder{color:var(--text-3);}
+.sidebar-filters{display:flex;flex-direction:column;gap:4px;padding:10px 12px 12px;}
+.zone-filter{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:7px;cursor:pointer;
+  border:1px solid transparent;transition:all .12s;
+  background:transparent;width:100%;text-align:left;
+}
+.zone-filter:hover{background:var(--surface-3);}
+.zone-filter.active-f{background:var(--surface-3);border-color:var(--line-mid);}
+.zone-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.zone-label{font:600 12px var(--sans);color:var(--text-2);flex:1;}
+.zone-count{font:700 11px var(--mono);color:var(--text-3);}
+.zone-filter.active-f .zone-label{color:var(--text-1);}
+.sidebar-stats{padding:14px 18px;border-top:1px solid var(--line);margin-top:auto;}
+.stat-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.stat-line:last-child{margin-bottom:0;}
+.stat-k{font:400 11px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;}
+.stat-v{font:700 13px var(--mono);color:var(--text-1);}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.main-toolbar{
+  padding:14px 24px;
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  flex-shrink:0;
+  background:var(--surface-1);
+}
+.toolbar-title{font:700 15px var(--sans);letter-spacing:-.03em;flex:1;}
+.btn{
+  border:none;border-radius:7px;padding:8px 16px;
+  font:600 12px var(--sans);cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:all .12s;white-space:nowrap;
+}
+.btn-ghost{background:var(--surface-3);color:var(--text-2);border:1px solid var(--line);}
+.btn-ghost:hover{border-color:var(--line-mid);color:var(--text-1);}
+.btn-amber{background:linear-gradient(135deg,var(--amber),#c08520);color:#1a1200;font-weight:700;}
+.btn-amber:hover{filter:brightness(1.1);}
+.btn-sm{padding:5px 11px;font-size:11px;}
+.btn-xs{padding:3px 8px;font-size:10px;}
+
+/* ── Zone Columns view ── */
+.zone-board{
+  flex:1;overflow:hidden;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+}
+.zone-col{
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--line);overflow:hidden;
+}
+.zone-col:last-child{border-right:none;}
+.zone-header{
+  padding:14px 18px 12px;
+  border-bottom:1px solid var(--line);
+  flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+}
+.zone-header-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.zone-header-name{font:700 13px var(--sans);letter-spacing:-.02em;flex:1;}
+.zone-header-count{font:700 11px var(--mono);color:var(--text-3);}
+.zone-body{flex:1;overflow-y:auto;padding:10px;}
+.zone-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;color:var(--text-3);gap:8px;padding:40px 20px;text-align:center;
+}
+.zone-empty-icon{font-size:28px;opacity:.4;}
+.zone-empty-txt{font:400 12px var(--mono);text-transform:uppercase;letter-spacing:.1em;}
+
+/* ── Cage Card ── */
+.cage-card{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:13px 14px;
+  margin-bottom:7px;
+  cursor:pointer;
+  transition:border-color .15s,transform .1s,box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.cage-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--zone-accent,var(--text-3));
+}
+.cage-card:hover{border-color:var(--line-mid);transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,0,0,.3);}
+.cage-card.selected{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber-glow);}
+.cage-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.cage-name{font:700 14px var(--sans);letter-spacing:-.02em;}
+.cage-trip{font:400 10px var(--mono);color:var(--text-3);margin-top:2px;}
+.cage-dims{
+  display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;
+}
+.dim-tag{
+  font:400 10px var(--mono);
+  padding:2px 7px;border-radius:4px;
+  background:var(--surface-3);color:var(--text-3);
+  border:1px solid var(--line);
+}
+.cage-zone-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font:600 10px var(--mono);padding:3px 8px;border-radius:5px;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+.cage-actions{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap;}
+.zone-btn{
+  flex:1;min-width:0;
+  padding:5px 6px;border:1px solid var(--line);border-radius:6px;
+  background:var(--surface-3);color:var(--text-3);
+  font:600 10px var(--mono);cursor:pointer;
+  transition:all .12s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.zone-btn:hover{border-color:var(--line-mid);color:var(--text-1);}
+.zone-btn.z-scaffold:hover{background:var(--z-scaffold-dim);border-color:var(--z-scaffold);color:var(--z-scaffold);}
+.zone-btn.z-spmt:hover{background:var(--z-spmt-dim);border-color:var(--z-spmt);color:var(--z-spmt);}
+.zone-btn.z-final:hover{background:var(--z-final-dim);border-color:var(--z-final);color:var(--z-final);}
+.zone-btn.active-zone{opacity:.35;cursor:default;pointer-events:none;}
+
+/* ── List view ── */
+.list-view{flex:1;overflow-y:auto;padding:16px 24px;}
+.list-table{width:100%;border-collapse:collapse;font-size:13px;}
+.list-table th{
+  text-align:left;padding:8px 12px;
+  font:700 10px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:1px solid var(--line);background:var(--surface-1);position:sticky;top:0;z-index:2;
+}
+.list-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.list-table tr:hover td{background:var(--surface-2);}
+.list-table tr:last-child td{border-bottom:none;}
+
+/* ── History/log Panel ── */
+.log-panel{
+  width:320px;flex-shrink:0;
+  background:var(--surface-1);
+  border-left:1px solid var(--line);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.log-header{padding:14px 18px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.log-title{font:700 13px var(--sans);letter-spacing:-.02em;}
+.log-body{flex:1;overflow-y:auto;padding:10px 14px;}
+.log-entry{
+  padding:9px 0;border-bottom:1px solid var(--line);
+  display:flex;gap:10px;align-items:flex-start;
+}
+.log-entry:last-child{border-bottom:none;}
+.log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.log-info{flex:1;min-width:0;}
+.log-cage{font:600 12px var(--sans);color:var(--text-1);}
+.log-move{font:400 11px var(--mono);color:var(--text-2);margin-top:2px;}
+.log-time{font:400 10px var(--mono);color:var(--text-3);margin-top:2px;}
+.log-empty{padding:30px 0;text-align:center;font:400 11px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;}
+
+/* ── View toggle ── */
+.view-toggle{display:flex;background:var(--surface-3);border-radius:7px;padding:3px;border:1px solid var(--line);}
+.vt-btn{
+  padding:5px 12px;border-radius:5px;border:none;background:transparent;
+  color:var(--text-3);font:600 11px var(--mono);cursor:pointer;transition:all .12s;
+}
+.vt-btn.active{background:var(--surface-1);color:var(--text-1);}
+
+/* ── Toast ── */
+.toast-wrap{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:999;pointer-events:none;}
+.toast{
+  background:var(--surface-2);border:1px solid var(--line-mid);border-radius:9px;
+  padding:11px 16px;font:400 13px var(--sans);color:var(--text-1);
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+  display:flex;align-items:center;gap:10px;
+  animation:toastIn .2s ease;pointer-events:auto;
+  min-width:220px;max-width:340px;
+}
+.toast.success .toast-icon{color:var(--z-final);}
+.toast.error .toast-icon{color:#f87171;}
+.toast.info .toast-icon{color:var(--amber);}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);
+  display:flex;align-items:center;justify-content:center;z-index:100;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.hidden{display:none;}
+.modal{
+  background:var(--surface-2);border:1px solid var(--line-mid);
+  border-radius:var(--radius-lg);padding:28px 30px;
+  width:100%;max-width:460px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+}
+.modal-title{font:700 18px var(--sans);letter-spacing:-.04em;margin-bottom:4px;}
+.modal-sub{font:400 11px var(--mono);color:var(--text-3);margin-bottom:20px;text-transform:uppercase;letter-spacing:.08em;}
+.modal-field{margin-bottom:14px;}
+.modal-label{font:700 10px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:5px;}
+.modal-input{
+  background:var(--surface-3);border:1px solid var(--line);border-radius:var(--radius);
+  padding:9px 13px;color:var(--text-1);font:400 13px var(--sans);width:100%;
+}
+.modal-input:focus{outline:none;border-color:var(--amber);}
+.modal-textarea{
+  background:var(--surface-3);border:1px solid var(--line);border-radius:var(--radius);
+  padding:9px 13px;color:var(--text-1);font:400 12px var(--mono);width:100%;
+  resize:vertical;min-height:80px;
+}
+.modal-textarea:focus{outline:none;border-color:var(--amber);}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.zone-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
+.zone-select-btn{
+  padding:10px 8px;border-radius:8px;border:1px solid var(--line);
+  background:var(--surface-3);color:var(--text-2);
+  font:600 11px var(--mono);cursor:pointer;
+  text-align:center;transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+.zone-select-btn:hover,.zone-select-btn.sel{border-width:1px;}
+.zone-select-btn.sel-scaffold{background:var(--z-scaffold-dim);border-color:var(--z-scaffold);color:var(--z-scaffold);}
+.zone-select-btn.sel-spmt{background:var(--z-spmt-dim);border-color:var(--z-spmt);color:var(--z-spmt);}
+.zone-select-btn.sel-final{background:var(--z-final-dim);border-color:var(--z-final);color:var(--z-final);}
+.zone-select-icon{font-size:18px;}
+
+/* Info badge in list view */
+.zbadge{
+  display:inline-flex;align-items:center;gap:5px;
+  font:600 10px var(--mono);padding:3px 8px;border-radius:5px;
+  letter-spacing:.04em;text-transform:uppercase;border:1px solid;
+}
+.zbadge-scaffold{color:var(--z-scaffold);background:var(--z-scaffold-dim);border-color:rgba(59,130,246,.3);}
+.zbadge-spmt{color:var(--z-spmt);background:var(--z-spmt-dim);border-color:rgba(168,85,247,.3);}
+.zbadge-final{color:var(--z-final);background:var(--z-final-dim);border-color:rgba(34,197,94,.3);}
+.zbadge-none{color:var(--text-3);background:transparent;border-color:var(--line);}
+
+/* Loading spinner */
+.spinner{width:16px;height:16px;border:2px solid var(--line-mid);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-screen{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+.loading-screen .spinner{width:28px;height:28px;}
+.loading-label{font:400 12px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;}
+
+/* responsive */
+@media(max-width:900px){
+  .sidebar{width:210px;}
+  .log-panel{display:none;}
+  .zone-board{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:650px){
+  .sidebar{display:none;}
+  .zone-board{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-mark">CC</div>
+  <div class="header-text">
+    <div class="header-title">Cage Construction</div>
+    <div class="header-sub">Site Tracker</div>
+  </div>
+  <div class="header-pill" id="cage-count-pill">—</div>
+  <div class="api-indicator" id="api-dot" title="API status"></div>
+</div>
+
+<!-- ── Auth Screen ── -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-icon">🏗️</div>
+    <div class="auth-title">Site Access</div>
+    <div class="auth-sub">Construction Site Tracker</div>
+    <div class="auth-api-row">
+      <label class="auth-api-label">API Base URL</label>
+      <input class="auth-api-input" id="api-url-input" type="url"
+        placeholder="https://your-worker.workers.dev"
+        value="">
+    </div>
+    <input class="auth-input" id="pin-input" type="password" maxlength="12"
+      placeholder="• • • • • •" autocomplete="current-password">
+    <button class="auth-btn" onclick="doAuth()">Enter Site →</button>
+    <div class="auth-err hidden" id="auth-err"></div>
+  </div>
+</div>
+
+<!-- ── App (hidden until auth) ── -->
+<div class="app hidden" id="app">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <input class="sidebar-search" type="text" id="search-input" placeholder="Search cage…" oninput="applyFilters()">
+    </div>
+    <div class="sidebar-filters" id="zone-filters">
+      <button class="zone-filter active-f" onclick="setZoneFilter('all',this)">
+        <div class="zone-dot" style="background:var(--text-3)"></div>
+        <div class="zone-label">All Cages</div>
+        <div class="zone-count" id="fc-all">0</div>
+      </button>
+      <button class="zone-filter" onclick="setZoneFilter('scaffold',this)">
+        <div class="zone-dot" style="background:var(--z-scaffold)"></div>
+        <div class="zone-label">Scaffold Storage</div>
+        <div class="zone-count" id="fc-scaffold">0</div>
+      </button>
+      <button class="zone-filter" onclick="setZoneFilter('spmt',this)">
+        <div class="zone-dot" style="background:var(--z-spmt)"></div>
+        <div class="zone-label">SPMT</div>
+        <div class="zone-count" id="fc-spmt">0</div>
+      </button>
+      <button class="zone-filter" onclick="setZoneFilter('final',this)">
+        <div class="zone-dot" style="background:var(--z-final)"></div>
+        <div class="zone-label">Final Location</div>
+        <div class="zone-count" id="fc-final">0</div>
+      </button>
+      <button class="zone-filter" onclick="setZoneFilter('unplaced',this)">
+        <div class="zone-dot" style="background:var(--text-3)"></div>
+        <div class="zone-label">Unplaced</div>
+        <div class="zone-count" id="fc-unplaced">0</div>
+      </button>
+    </div>
+    <div class="sidebar-stats">
+      <div class="stat-line"><span class="stat-k">Total shipped</span><span class="stat-v" id="st-total">—</span></div>
+      <div class="stat-line"><span class="stat-k">At final loc.</span><span class="stat-v" id="st-final" style="color:var(--z-final)">—</span></div>
+      <div class="stat-line"><span class="stat-k">In progress</span><span class="stat-v" id="st-progress" style="color:var(--amber)">—</span></div>
+      <div class="stat-line"><span class="stat-k">Unplaced</span><span class="stat-v" id="st-unplaced" style="color:var(--text-3)">—</span></div>
+    </div>
+  </div>
+
+  <!-- Main area -->
+  <div class="main">
+    <div class="main-toolbar">
+      <div class="toolbar-title" id="view-title">On-Site Cages</div>
+      <div class="view-toggle">
+        <button class="vt-btn active" id="vt-board" onclick="setView('board')">⊞ Board</button>
+        <button class="vt-btn" id="vt-list" onclick="setView('list')">≡ List</button>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="refreshData()"><span class="spinner" style="width:11px;height:11px;border-width:1.5px;" id="refresh-spin"></span> Refresh</button>
+    </div>
+
+    <!-- Board view -->
+    <div class="zone-board" id="board-view">
+      <!-- Scaffold Storage -->
+      <div class="zone-col">
+        <div class="zone-header">
+          <div class="zone-header-dot" style="background:var(--z-scaffold)"></div>
+          <div class="zone-header-name">Scaffold Storage</div>
+          <div class="zone-header-count" id="col-count-scaffold">0</div>
+        </div>
+        <div class="zone-body" id="col-scaffold"></div>
+      </div>
+      <!-- SPMT -->
+      <div class="zone-col">
+        <div class="zone-header">
+          <div class="zone-header-dot" style="background:var(--z-spmt)"></div>
+          <div class="zone-header-name">SPMT</div>
+          <div class="zone-header-count" id="col-count-spmt">0</div>
+        </div>
+        <div class="zone-body" id="col-spmt"></div>
+      </div>
+      <!-- Final Location -->
+      <div class="zone-col">
+        <div class="zone-header">
+          <div class="zone-header-dot" style="background:var(--z-final)"></div>
+          <div class="zone-header-name">Final Location</div>
+          <div class="zone-header-count" id="col-count-final">0</div>
+        </div>
+        <div class="zone-body" id="col-final"></div>
+      </div>
+    </div>
+
+    <!-- List view -->
+    <div class="list-view hidden" id="list-view">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th>Cage</th>
+            <th>Dimensions</th>
+            <th>Weight</th>
+            <th>Zone</th>
+            <th>Notes</th>
+            <th>Move</th>
+          </tr>
+        </thead>
+        <tbody id="list-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-screen hidden" id="loading-screen">
+      <div class="spinner"></div>
+      <div class="loading-label">Loading site data…</div>
+    </div>
+  </div>
+
+  <!-- Log panel -->
+  <div class="log-panel">
+    <div class="log-header">
+      <div class="log-title">Movement Log</div>
+    </div>
+    <div class="log-body" id="log-body">
+      <div class="log-empty">No moves yet</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Move Modal ── -->
+<div class="modal-overlay hidden" id="move-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-cage-name">Move Cage</div>
+    <div class="modal-sub" id="modal-cage-dims"></div>
+    <div class="modal-field">
+      <label class="modal-label">Select Zone</label>
+      <div class="zone-select-grid">
+        <button class="zone-select-btn" id="zsb-scaffold" onclick="selectZone('scaffold')">
+          <span class="zone-select-icon">🏗</span>Scaffold<br>Storage
+        </button>
+        <button class="zone-select-btn" id="zsb-spmt" onclick="selectZone('spmt')">
+          <span class="zone-select-icon">🚛</span>SPMT
+        </button>
+        <button class="zone-select-btn" id="zsb-final" onclick="selectZone('final')">
+          <span class="zone-select-icon">📍</span>Final<br>Location
+        </button>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Notes <span style="color:var(--text-3)">(optional)</span></label>
+      <textarea class="modal-textarea" id="modal-notes" placeholder="e.g. Bay 4, position 2A…" rows="3"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-amber" id="modal-confirm" onclick="confirmMove()">Confirm Move</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast container ── -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════
+let API_BASE   = '';
+let SESSION_PIN = '';
+let ALL_CAGES  = [];   // all shipped cages (location==='sea')
+let FILTERED   = [];   // after search/filter
+let CURRENT_VIEW = 'board';
+let ZONE_FILTER  = 'all';
+let MODAL_CAGE   = null;
+let MODAL_ZONE   = null;
+
+// Session movement log (in-memory, this session only)
+let MOVE_LOG = [];
+
+// Zone definitions
+const ZONES = {
+  scaffold: { label: 'Scaffold Storage', color: 'var(--z-scaffold)', cls: 'scaffold', icon: '🏗' },
+  spmt:     { label: 'SPMT',             color: 'var(--z-spmt)',     cls: 'spmt',     icon: '🚛' },
+  final:    { label: 'Final Location',   color: 'var(--z-final)',    cls: 'final',    icon: '📍' },
+};
+
+// Parse zone from locationDetail
+function parseZone(cage) {
+  const d = (cage.locationDetail || cage.location_detail || '').toLowerCase();
+  if (d.includes('scaffold')) return 'scaffold';
+  if (d.includes('spmt'))     return 'spmt';
+  if (d.includes('final'))    return 'final';
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════════
+// Persist API base + pin in localStorage for convenience
+const LS_API = 'cc_api_base';
+const LS_PIN = 'cc_pin';
+
+window.addEventListener('DOMContentLoaded', () => {
+  const savedApi = localStorage.getItem(LS_API);
+  const savedPin = localStorage.getItem(LS_PIN);
+  if (savedApi) document.getElementById('api-url-input').value = savedApi;
+  if (savedPin) document.getElementById('pin-input').value = savedPin;
+
+  document.getElementById('pin-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doAuth();
+  });
+});
+
+async function doAuth() {
+  const apiUrl = document.getElementById('api-url-input').value.trim().replace(/\/$/, '');
+  const pin    = document.getElementById('pin-input').value.trim();
+  const errEl  = document.getElementById('auth-err');
+  errEl.classList.add('hidden');
+
+  if (!apiUrl) { showAuthErr('Enter the API base URL.'); return; }
+  if (!pin)    { showAuthErr('Enter your PIN.'); return; }
+
+  try {
+    const res = await fetch(apiUrl + '/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin }),
+    });
+    const data = await res.json();
+    if (!data.ok) { showAuthErr(data.error || 'Incorrect PIN.'); return; }
+
+    API_BASE    = apiUrl;
+    SESSION_PIN = pin;
+    localStorage.setItem(LS_API, apiUrl);
+    localStorage.setItem(LS_PIN, pin);
+
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('api-dot').classList.add('ok');
+    await loadData();
+  } catch(e) {
+    showAuthErr('Could not reach API. Check the URL.');
+    document.getElementById('api-dot').classList.add('err');
+  }
+}
+
+function showAuthErr(msg) {
+  const el = document.getElementById('auth-err');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════
+async function loadData() {
+  document.getElementById('loading-screen').classList.remove('hidden');
+  document.getElementById('board-view').classList.add('hidden');
+  document.getElementById('list-view').classList.add('hidden');
+
+  try {
+    const res = await fetch(API_BASE + '/api/state', {
+      headers: { 'Authorization': 'Bearer ' + SESSION_PIN }
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const state = await res.json();
+
+    // Only cages that are "at sea" / shipped
+    ALL_CAGES = (state.cages || []).filter(c => c.location === 'sea');
+
+    updateSidebar();
+    applyFilters();
+
+    document.getElementById('loading-screen').classList.add('hidden');
+    if (CURRENT_VIEW === 'board') document.getElementById('board-view').classList.remove('hidden');
+    else document.getElementById('list-view').classList.remove('hidden');
+
+    document.getElementById('api-dot').classList.remove('err');
+    document.getElementById('api-dot').classList.add('ok');
+  } catch(e) {
+    document.getElementById('loading-screen').classList.add('hidden');
+    document.getElementById('api-dot').classList.remove('ok');
+    document.getElementById('api-dot').classList.add('err');
+    toast('Failed to load data: ' + e.message, 'error');
+    // Show empty views
+    document.getElementById('board-view').classList.remove('hidden');
+  }
+}
+
+async function refreshData() {
+  const spin = document.getElementById('refresh-spin');
+  spin.style.display = 'inline-block';
+  await loadData();
+  spin.style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FILTERS & RENDER
+// ═══════════════════════════════════════════════════════════════════════
+function applyFilters() {
+  const q = (document.getElementById('search-input').value || '').toLowerCase();
+  FILTERED = ALL_CAGES.filter(c => {
+    const name = (c.name || '').toLowerCase();
+    const matchQ = !q || name.includes(q);
+    const zone = parseZone(c);
+    const matchZ =
+      ZONE_FILTER === 'all'      ? true :
+      ZONE_FILTER === 'unplaced' ? !zone :
+      zone === ZONE_FILTER;
+    return matchQ && matchZ;
+  });
+  renderBoard();
+  renderList();
+  updateSidebar();
+}
+
+function setZoneFilter(z, btn) {
+  ZONE_FILTER = z;
+  document.querySelectorAll('.zone-filter').forEach(b => b.classList.remove('active-f'));
+  btn.classList.add('active-f');
+  applyFilters();
+}
+
+function updateSidebar() {
+  const all      = ALL_CAGES.length;
+  const scaffold = ALL_CAGES.filter(c => parseZone(c) === 'scaffold').length;
+  const spmt     = ALL_CAGES.filter(c => parseZone(c) === 'spmt').length;
+  const final    = ALL_CAGES.filter(c => parseZone(c) === 'final').length;
+  const unplaced = ALL_CAGES.filter(c => !parseZone(c)).length;
+  const inProg   = scaffold + spmt;
+
+  document.getElementById('fc-all').textContent      = all;
+  document.getElementById('fc-scaffold').textContent  = scaffold;
+  document.getElementById('fc-spmt').textContent      = spmt;
+  document.getElementById('fc-final').textContent     = final;
+  document.getElementById('fc-unplaced').textContent  = unplaced;
+
+  document.getElementById('st-total').textContent    = all;
+  document.getElementById('st-final').textContent    = final;
+  document.getElementById('st-progress').textContent = inProg;
+  document.getElementById('st-unplaced').textContent = unplaced;
+
+  const pill = all === 0 ? '— cages' : `${all} cage${all!==1?'s':''} on site`;
+  document.getElementById('cage-count-pill').textContent = pill;
+}
+
+// ── Board ──
+function renderBoard() {
+  const zones = ['scaffold','spmt','final'];
+  // Split FILTERED by zone — also show "unplaced" in scaffold column if filter is all/unplaced
+  const byZone = { scaffold:[], spmt:[], final:[] };
+  const unplaced = [];
+
+  FILTERED.forEach(c => {
+    const z = parseZone(c);
+    if (z) byZone[z].push(c);
+    else unplaced.push(c);
+  });
+
+  // Unplaced cages go in scaffold column visually (with distinct style)
+  const scaffoldAll = [...byZone.scaffold, ...unplaced];
+
+  ['scaffold','spmt','final'].forEach(z => {
+    const col = document.getElementById('col-' + z);
+    const cages = z === 'scaffold' ? scaffoldAll : byZone[z];
+    document.getElementById('col-count-' + z).textContent = z === 'scaffold'
+      ? (byZone.scaffold.length + (unplaced.length ? ` +${unplaced.length}` : ''))
+      : byZone[z].length;
+    if (!cages.length) {
+      col.innerHTML = `<div class="zone-empty"><div class="zone-empty-icon">${ZONES[z].icon}</div><div class="zone-empty-txt">No cages</div></div>`;
+      return;
+    }
+    col.innerHTML = cages.map(c => buildCageCard(c, z)).join('');
+  });
+}
+
+function buildCageCard(cage, colZone) {
+  const zone = parseZone(cage);
+  const zDef = zone ? ZONES[zone] : null;
+  const accent = zDef ? zDef.color : 'var(--text-3)';
+  const badgeCls = zone ? `zbadge-${zone}` : 'zbadge-none';
+  const badgeTxt = zDef ? zDef.label : 'Unplaced';
+  const dimStr = [
+    cage.width  ? cage.width  + 'm W' : null,
+    cage.height ? cage.height + 'm H' : null,
+    cage.length ? cage.length + 'm L' : null,
+  ].filter(Boolean).join(' · ');
+  const wt = cage.weight ? cage.weight + 't' : null;
+  const notesText = cage.notes ? `<div style="font:400 10px var(--mono);color:var(--text-3);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(cage.notes)}">${esc(cage.notes)}</div>` : '';
+
+  const otherZones = ['scaffold','spmt','final'].filter(z => z !== zone);
+  const actionBtns = otherZones.map(z =>
+    `<button class="zone-btn z-${z}" onclick="event.stopPropagation();quickMove('${cage.id}','${z}')" title="Move to ${ZONES[z].label}">${ZONES[z].icon} ${ZONES[z].label}</button>`
+  ).join('');
+
+  return `<div class="cage-card" style="--zone-accent:${accent}" onclick="openModal('${cage.id}')">
+    <div class="cage-top">
+      <div>
+        <div class="cage-name">${esc(cage.name)}</div>
+        <span class="zbadge ${badgeCls}">${badgeTxt}</span>
+      </div>
+    </div>
+    <div class="cage-dims">
+      ${dimStr ? `<div class="dim-tag">${dimStr}</div>` : ''}
+      ${wt ? `<div class="dim-tag" style="color:var(--amber)">${wt}</div>` : ''}
+    </div>
+    ${notesText}
+    <div class="cage-actions">${actionBtns}</div>
+  </div>`;
+}
+
+// ── List ──
+function renderList() {
+  const tbody = document.getElementById('list-body');
+  if (!FILTERED.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-3);font:400 12px var(--mono);">No cages match current filter</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = FILTERED.map(c => {
+    const zone = parseZone(c);
+    const zDef = zone ? ZONES[zone] : null;
+    const badgeCls = zone ? `zbadge-${zone}` : 'zbadge-none';
+    const badgeTxt = zDef ? zDef.label : 'Unplaced';
+    const dims = [c.width?c.width+'m W':null, c.height?c.height+'m H':null, c.length?c.length+'m L':null].filter(Boolean).join(' × ');
+    const wt = c.weight ? c.weight + 't' : '—';
+    const notes = c.notes ? `<span style="color:var(--text-3)">${esc(c.notes)}</span>` : '<span style="color:var(--text-3)">—</span>';
+    return `<tr>
+      <td><span style="font:700 13px var(--sans)">${esc(c.name)}</span></td>
+      <td style="font:400 12px var(--mono);color:var(--text-2)">${dims || '—'}</td>
+      <td style="font:700 12px var(--mono);color:var(--amber)">${wt}</td>
+      <td><span class="zbadge ${badgeCls}">${badgeTxt}</span></td>
+      <td style="font:400 11px var(--mono)">${notes}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="openModal('${c.id}')">Move →</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════════════
+function openModal(cageId) {
+  MODAL_CAGE = ALL_CAGES.find(c => c.id === cageId);
+  if (!MODAL_CAGE) return;
+  MODAL_ZONE = parseZone(MODAL_CAGE);
+
+  document.getElementById('modal-cage-name').textContent = MODAL_CAGE.name;
+  const dims = [
+    MODAL_CAGE.width  ? MODAL_CAGE.width + 'm wide' : null,
+    MODAL_CAGE.height ? MODAL_CAGE.height + 'm tall' : null,
+    MODAL_CAGE.weight ? MODAL_CAGE.weight + 't'      : null,
+  ].filter(Boolean).join(' · ');
+  document.getElementById('modal-cage-dims').textContent = dims || 'Cage details';
+  document.getElementById('modal-notes').value = '';
+
+  // Highlight current zone
+  ['scaffold','spmt','final'].forEach(z => {
+    const btn = document.getElementById('zsb-' + z);
+    btn.className = 'zone-select-btn' + (MODAL_ZONE === z ? ' sel-' + z : '');
+  });
+
+  document.getElementById('move-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('move-modal').classList.add('hidden');
+  MODAL_CAGE = null;
+  MODAL_ZONE = null;
+}
+
+function selectZone(z) {
+  MODAL_ZONE = z;
+  ['scaffold','spmt','final'].forEach(zone => {
+    const btn = document.getElementById('zsb-' + zone);
+    btn.className = 'zone-select-btn' + (zone === z ? ' sel-' + z : '');
+  });
+}
+
+async function confirmMove() {
+  if (!MODAL_CAGE || !MODAL_ZONE) {
+    toast('Select a zone first.', 'error'); return;
+  }
+  const notes = document.getElementById('modal-notes').value.trim();
+  await moveCage(MODAL_CAGE.id, MODAL_ZONE, notes);
+  closeModal();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MOVE LOGIC
+// ═══════════════════════════════════════════════════════════════════════
+async function quickMove(cageId, zone) {
+  await moveCage(cageId, zone, '');
+}
+
+async function moveCage(cageId, zone, notes) {
+  const cage = ALL_CAGES.find(c => c.id === cageId);
+  if (!cage) return;
+  const prevZone = parseZone(cage);
+  if (prevZone === zone) { toast('Cage already in that zone.', 'info'); return; }
+
+  const zDef = ZONES[zone];
+  const locationDetail = zDef.label + (notes ? ' — ' + notes : '');
+
+  // Optimistic update
+  cage.locationDetail = locationDetail;
+  applyFilters();
+
+  // Build the updated cage payload matching what the worker expects
+  const payload = {
+    id:                 cage.id,
+    name:               cage.name,
+    height:             cage.height || 0,
+    width:              cage.width  || 0,
+    length:             cage.length || 0,
+    weight:             cage.weight || 0,
+    location:           'sea',            // stays 'sea' — still at client site
+    locationDetail:     locationDetail,
+    departureDate:      cage.departure_date || cage.departureDate || null,
+    proposedShipDay:    cage.proposed_ship_day || cage.proposedShipDay || null,
+    proposedTripId:     cage.proposed_trip_id || cage.proposedTripId || null,
+    notes:              cage.notes || null,
+    shippingPreference: cage.shippingPreference ? 1 : 0,
+    shippingPreference2:cage.shippingPreference2 ? 1 : 0,
+    locationHistory:    cage.locationHistory || cage.location_history || [],
+    intoRmd:            cage.intoRmd || cage.into_rmd || null,
+    outOfRmd:           cage.outOfRmd || cage.out_of_rmd || null,
+  };
+
+  try {
+    const res = await fetch(API_BASE + '/api/cages', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SESSION_PIN,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => res.status);
+      throw new Error(txt);
+    }
+
+    // Log the move
+    const entry = {
+      cageId,
+      cageName: cage.name,
+      from: prevZone ? ZONES[prevZone].label : 'Unplaced',
+      to: zDef.label,
+      notes,
+      ts: new Date(),
+      zoneKey: zone,
+    };
+    MOVE_LOG.unshift(entry);
+    renderLog();
+
+    toast(`${cage.name} → ${zDef.label}`, 'success');
+  } catch(e) {
+    // Revert
+    cage.locationDetail = prevZone ? ZONES[prevZone].label : '';
+    applyFilters();
+    toast('Move failed: ' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// LOG
+// ═══════════════════════════════════════════════════════════════════════
+function renderLog() {
+  const body = document.getElementById('log-body');
+  if (!MOVE_LOG.length) {
+    body.innerHTML = '<div class="log-empty">No moves yet</div>';
+    return;
+  }
+  body.innerHTML = MOVE_LOG.map(e => {
+    const z = ZONES[e.zoneKey];
+    const color = z ? z.color : 'var(--text-3)';
+    const timeStr = e.ts.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const dateStr = e.ts.toLocaleDateString([], {day:'2-digit',month:'short'});
+    return `<div class="log-entry">
+      <div class="log-dot" style="background:${color}"></div>
+      <div class="log-info">
+        <div class="log-cage">${esc(e.cageName)}</div>
+        <div class="log-move">${esc(e.from)} → ${esc(e.to)}${e.notes ? ' · ' + esc(e.notes) : ''}</div>
+        <div class="log-time">${dateStr} ${timeStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// VIEW TOGGLE
+// ═══════════════════════════════════════════════════════════════════════
+function setView(v) {
+  CURRENT_VIEW = v;
+  document.getElementById('board-view').classList.toggle('hidden', v !== 'board');
+  document.getElementById('list-view').classList.toggle('hidden', v !== 'list');
+  document.getElementById('vt-board').classList.toggle('active', v === 'board');
+  document.getElementById('vt-list').classList.toggle('active', v === 'list');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════
+function toast(msg, type = 'info') {
+  const icons = { success: '✓', error: '✕', info: '→' };
+  const wrap  = document.getElementById('toast-wrap');
+  const el    = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="toast-icon">${icons[type]||'·'}</span><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close modal on overlay click
+document.getElementById('move-modal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
