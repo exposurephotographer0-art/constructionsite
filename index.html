@@ -192,11 +192,11 @@ tbody td.null-val{color:var(--t3);font-style:italic;}
 
       <div class="section-title">What the Master DB holds</div>
       <p style="font:400 12px var(--mono);color:var(--t3);line-height:1.8;margin-bottom:20px">
-        The <strong style="color:var(--amber)">armf-master</strong> D1 database collates data from two sources:<br>
-        <span style="color:var(--t2)">① Cage Tool DB</span> — all cage, frame, movement, shipment, factory and audit data (read via CAGE_DB binding)<br>
-        <span style="color:var(--t2)">② Remote DB</span> — the <code style="color:var(--amber)">analyses</code> table pulled in via the Cloudflare API<br><br>
-        The cage tool and cage traveller apps now read mesh weights and cage refresh data from here instead of syncing the remote DB themselves.
-        Hit <strong style="color:var(--amber)">Sync Master</strong> above to pull the latest analyses from the remote DB.
+        The <strong style="color:var(--amber)">armf-master</strong> D1 database is a complete mirror of two sources:<br>
+        <span style="color:var(--t2)">① Cage Tool DB</span> — every table copied as <code style="color:var(--amber)">cage_{tablename}</code><br>
+        <span style="color:var(--t2)">② Remote DB</span> — every table copied as <code style="color:var(--amber)">remote_{tablename}</code><br><br>
+        To sync: go to <strong style="color:var(--t2)">DB Explorer → Remote DB</strong> tab and enter your Account ID + Database UUID, then come back here and click <strong style="color:var(--amber)">Sync Master</strong>.<br>
+        Mesh weights for the cage tool and cage traveller are served from <code style="color:var(--amber)">remote_analyses</code> in this master DB.
       </p>
 
       <div class="section-title">Mesh Weights Preview</div>
@@ -318,48 +318,62 @@ function setTopTab(t) {
 async function doSync() {
   const btn = document.getElementById('sync-btn');
   btn.classList.add('spinning');
-  setSyncStatus('syncing','Syncing analyses from remote DB…','');
+  setSyncStatus('syncing','Syncing all tables into master DB…','');
+
+  // Get remote credentials from localStorage (same ones used in DB explorer)
+  const accountId = localStorage.getItem('armf_remote_account')||'';
+  const dbUuid    = localStorage.getItem('armf_remote_uuid')||'';
+
+  if (!accountId || !dbUuid) {
+    setSyncStatus('warn','Remote DB credentials not set — go to DB Explorer → Remote DB tab and enter Account ID + UUID first, then click Connect. After that, Sync Master will work.','');
+    btn.classList.remove('spinning');
+    return;
+  }
+
   try {
-    const r = await fetch(`${API_URL}/api/sync`,{method:'POST',headers:ah()});
-    if (r.status===401){doLogout();return;}
+    const r = await fetch(`${API_URL}/api/sync`,{
+      method:'POST',
+      headers:{...ah(),'Content-Type':'application/json'},
+      body: JSON.stringify({ accountId, dbUuid }),
+    });
+    if(r.status===401){doLogout();return;}
     const d = await r.json();
-    if (d.ok) {
-      setSyncStatus('ok',`Synced ${d.synced} rows`,new Date(d.syncedAt).toLocaleString());
-      setCards(d.synced,null,null);
+    if(d.ok){
+      setSyncStatus('ok',
+        `Synced ${d.cageTables} cage tables (${d.cageRows} rows) + ${d.remoteTables} remote tables (${d.remoteRows} rows)`,
+        new Date(d.syncedAt).toLocaleString());
+      setCards(d.cageTables, d.remoteTables, d.cageRows, d.remoteRows, d.syncedAt);
       loadMeshPreview();
     } else {
       setSyncStatus('err','Sync failed: '+(d.error||'unknown'),'');
     }
-  } catch(e) { setSyncStatus('err','Sync error: '+e.message,''); }
-  finally { btn.classList.remove('spinning'); }
+  } catch(e){setSyncStatus('err','Sync error: '+e.message,'');}
+  finally{btn.classList.remove('spinning');}
 }
 
 async function loadSyncStatus() {
   try {
     const r = await fetch(`${API_URL}/api/sync-status`,{headers:ah()});
-    if (!r.ok) return;
+    if(!r.ok)return;
     const d = await r.json();
-    if (!d.ok) { setSyncStatus('warn','Master DB not yet synced',''); return; }
-    if (!d.lastSync) { setSyncStatus('warn','No sync yet — click Sync Master to populate',''); return; }
-    setSyncStatus('ok',`${d.totalRows} rows (${d.acceptedRows} accepted)`,new Date(d.lastSync).toLocaleString());
-    setCards(d.totalRows, d.acceptedRows, d.lastSync);
+    if(!d.ok||!d.lastSync){setSyncStatus('warn','No sync yet — enter Remote DB credentials in the DB Explorer tab, then click Sync Master','');return;}
+    setSyncStatus('ok',
+      `${d.cageTables} cage tables + ${d.remoteTables} remote tables in master`,
+      'Last sync: '+new Date(d.lastSync).toLocaleString());
+    setCards(d.cageTables, d.remoteTables, d.cageRows||0, d.remoteRows||0, d.lastSync);
   } catch {}
 }
 
 function setSyncStatus(state, label, time) {
-  const dot   = document.getElementById('sync-dot');
-  const lbl   = document.getElementById('sync-label');
-  const tEl   = document.getElementById('sync-time');
-  dot.className  = 'sync-dot '+state;
-  lbl.textContent = label;
-  tEl.textContent = time;
+  const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label'),tEl=document.getElementById('sync-time');
+  dot.className='sync-dot '+state; lbl.textContent=label; tEl.textContent=time;
 }
 
-function setCards(total, accepted, lastSync) {
+function setCards(cageTbls, remoteTbls, cageRows, remoteRows, lastSync) {
   document.getElementById('master-cards').innerHTML = `
-    <div class="stat-card amber"><div class="stat-label">Total Rows</div><div class="stat-value">${total??'—'}</div><div class="stat-sub">in analyses_master</div></div>
-    <div class="stat-card green"><div class="stat-label">Accepted</div><div class="stat-value">${accepted??'—'}</div><div class="stat-sub">status = accepted</div></div>
-    <div class="stat-card blue"><div class="stat-label">Last Sync</div><div class="stat-value" style="font-size:14px;line-height:1.4">${lastSync ? new Date(lastSync).toLocaleDateString() : '—'}</div><div class="stat-sub">${lastSync ? new Date(lastSync).toLocaleTimeString() : 'never'}</div></div>
+    <div class="stat-card amber"><div class="stat-label">Cage DB Tables</div><div class="stat-value">${cageTbls??'—'}</div><div class="stat-sub">${cageRows??0} rows synced</div></div>
+    <div class="stat-card green"><div class="stat-label">Remote DB Tables</div><div class="stat-value">${remoteTbls??'—'}</div><div class="stat-sub">${remoteRows??0} rows synced</div></div>
+    <div class="stat-card blue"><div class="stat-label">Last Sync</div><div class="stat-value" style="font-size:14px;line-height:1.4">${lastSync?new Date(lastSync).toLocaleDateString():'—'}</div><div class="stat-sub">${lastSync?new Date(lastSync).toLocaleTimeString():'never'}</div></div>
   `;
 }
 
