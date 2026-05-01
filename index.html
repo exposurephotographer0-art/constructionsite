@@ -5,481 +5,1466 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0d0e11">
-<title>ARMF Viewer</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>ARMF Viewer — Master Database</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 .hidden{display:none!important;}
-:root{
-  --bg:#0d0e11;--s1:#13141a;--s2:#1a1c23;--s3:#22252f;--s4:#2a2e3a;
-  --line:rgba(255,255,255,.06);--line-mid:rgba(255,255,255,.11);
-  --t1:#e8eaf0;--t2:#9aa0b4;--t3:#5a6075;
-  --amber:#f0a500;--amber-dim:rgba(240,165,0,.10);--amber-glow:rgba(240,165,0,.22);
-  --green:#22c55e;--green-dim:rgba(34,197,94,.12);
-  --red:#f87171;--red-dim:rgba(248,113,113,.12);
-  --blue:#60a5fa;--blue-dim:rgba(96,165,250,.10);
-  --r:8px;--r-lg:14px;--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
-}
-html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--sans);overflow:hidden;}
-::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px;}
 
-/* Auth */
-.auth-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);}
-.auth-card{background:var(--s2);border:1px solid var(--line-mid);border-radius:var(--r-lg);padding:40px 44px;width:100%;max-width:380px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.5);}
-.auth-logo{width:52px;height:52px;border-radius:13px;background:linear-gradient(135deg,var(--amber),#c08520);display:flex;align-items:center;justify-content:center;font:800 17px var(--mono);color:#1a0f00;margin:0 auto 18px;box-shadow:0 8px 24px var(--amber-glow);}
-.auth-title{font:800 22px var(--sans);letter-spacing:-.04em;margin-bottom:4px;}
-.auth-sub{font:400 10px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:24px;}
-.auth-input{background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:13px 16px;color:var(--t1);font:700 22px var(--mono);letter-spacing:.3em;text-align:center;width:100%;transition:border-color .2s;margin-bottom:12px;}
+:root {
+  --bg:          #0d0e11;
+  --surface-1:   #13141a;
+  --surface-2:   #1a1c23;
+  --surface-3:   #22252f;
+  --surface-4:   #2a2e3a;
+  --line:        rgba(255,255,255,0.06);
+  --line-mid:    rgba(255,255,255,0.11);
+  --text-1:      #e8eaf0;
+  --text-2:      #9aa0b4;
+  --text-3:      #5a6075;
+  --amber:       #f0a500;
+  --amber-dim:   rgba(240,165,0,0.10);
+  --amber-glow:  rgba(240,165,0,0.25);
+  --green:       #22c55e;
+  --green-dim:   rgba(34,197,94,0.12);
+  --red:         #f87171;
+  --red-dim:     rgba(248,113,113,0.12);
+  --blue:        #60a5fa;
+  --blue-dim:    rgba(96,165,250,0.10);
+  --purple:      #a78bfa;
+  --purple-dim:  rgba(167,139,250,0.10);
+  --radius:      8px;
+  --radius-lg:   14px;
+  --mono:        'Space Mono', monospace;
+  --sans:        'Syne', sans-serif;
+  --header-h:    58px;
+  --tab-h:       48px;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text-1);font-family:var(--sans);}
+body{display:flex;flex-direction:column;overflow:hidden;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--surface-4);border-radius:2px;}
+
+/* ── Auth Screen ── */
+.auth-screen{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+}
+.auth-card{
+  background:var(--surface-2);border:1px solid var(--line-mid);
+  border-radius:var(--radius-lg);padding:40px 44px;
+  width:100%;max-width:400px;text-align:center;
+  box-shadow:0 32px 80px rgba(0,0,0,.5);
+}
+.auth-logo{
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,var(--amber),#c08520);
+  display:flex;align-items:center;justify-content:center;
+  font:800 20px var(--mono);color:#1a0f00;
+  margin:0 auto 20px;
+  box-shadow:0 8px 24px var(--amber-glow);
+}
+.auth-title{font:800 24px var(--sans);letter-spacing:-.04em;margin-bottom:4px;}
+.auth-sub{font:400 11px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;}
+.auth-api-row{
+  display:flex;gap:8px;margin-bottom:16px;
+}
+.auth-api-input{
+  flex:1;background:var(--surface-3);border:1px solid var(--line-mid);
+  border-radius:var(--radius);padding:10px 13px;
+  color:var(--text-2);font:400 11px var(--mono);
+  transition:border-color .2s;
+}
+.auth-api-input:focus{outline:none;border-color:var(--amber);}
+.auth-input{
+  background:var(--surface-3);border:1px solid var(--line-mid);
+  border-radius:var(--radius);padding:13px 16px;
+  color:var(--text-1);font:700 22px var(--mono);letter-spacing:.3em;
+  text-align:center;width:100%;transition:border-color .2s;margin-bottom:12px;
+}
 .auth-input:focus{outline:none;border-color:var(--amber);}
-.auth-btn{width:100%;padding:13px;border-radius:var(--r);border:none;background:linear-gradient(135deg,var(--amber),#c08520);color:#1a0f00;font:700 14px var(--sans);cursor:pointer;transition:filter .15s;letter-spacing:.02em;}
+.auth-btn{
+  width:100%;padding:13px;border-radius:var(--radius);border:none;
+  background:linear-gradient(135deg,var(--amber),#c08520);
+  color:#1a0f00;font:700 14px var(--sans);cursor:pointer;
+  transition:filter .15s;letter-spacing:.02em;
+}
 .auth-btn:hover{filter:brightness(1.1);}
 .auth-err{margin-top:10px;font:400 11px var(--mono);color:var(--red);}
 
-/* App shell */
-.app{display:flex;flex-direction:column;height:100%;}
-.header{background:var(--s1);border-bottom:1px solid var(--line);padding:0 20px;height:58px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.header-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--amber),#c08520);display:flex;align-items:center;justify-content:center;font:800 10px var(--mono);color:#1a0f00;flex-shrink:0;}
-.header-title{font:800 16px var(--sans);letter-spacing:-.04em;}
-.header-sub{font:400 10px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:1px;}
+/* ── Header ── */
+.header{
+  background:var(--surface-1);border-bottom:1px solid var(--line);
+  padding:0 24px;height:var(--header-h);
+  display:flex;align-items:center;gap:14px;flex-shrink:0;
+}
+.header-mark{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--amber),#c08520);
+  display:flex;align-items:center;justify-content:center;
+  font:800 11px var(--mono);color:#1a0f00;letter-spacing:-.01em;flex-shrink:0;
+}
+.header-title{font:800 17px var(--sans);letter-spacing:-.04em;color:var(--text-1);}
+.header-sub{font:400 10px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-top:1px;}
 .header-spacer{flex:1;}
-.header-btn{background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:6px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px;}
-.header-btn:hover{border-color:var(--amber);color:var(--amber);}
-.header-btn.spinning svg{animation:spin .8s linear infinite;}
+.status-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--text-3);transition:background .3s;flex-shrink:0;
+}
+.status-dot.ok{background:var(--green);}
+.status-dot.err{background:var(--red);}
+.status-dot.warn{background:var(--amber);}
+.header-pill{
+  font:700 10px var(--mono);padding:3px 9px;border-radius:20px;
+  background:var(--amber-dim);color:var(--amber);
+  border:1px solid var(--amber-glow);letter-spacing:.06em;text-transform:uppercase;
+}
+.refresh-btn{
+  background:var(--surface-3);border:1px solid var(--line-mid);
+  border-radius:var(--radius);padding:6px 13px;
+  color:var(--text-2);font:600 11px var(--sans);cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:all .12s;
+}
+.refresh-btn:hover{border-color:var(--amber);color:var(--amber);}
+.refresh-btn.spinning svg{animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.logout-btn{background:transparent;border:1px solid var(--line);border-radius:var(--r);padding:6px 12px;color:var(--t3);font:600 11px var(--sans);cursor:pointer;transition:all .12s;}
+.logout-btn{
+  background:transparent;border:1px solid var(--line);
+  border-radius:var(--radius);padding:6px 12px;
+  color:var(--text-3);font:600 11px var(--sans);cursor:pointer;
+  transition:all .12s;
+}
 .logout-btn:hover{border-color:var(--red);color:var(--red);}
+.fetch-time{font:400 10px var(--mono);color:var(--text-3);}
 
-/* Top-level tabs */
-.top-tabs{background:var(--s1);border-bottom:1px solid var(--line);padding:0 20px;display:flex;gap:2px;flex-shrink:0;}
-.top-tab{background:transparent;border:none;border-bottom:2px solid transparent;padding:0 14px;height:44px;color:var(--t3);font:700 12px var(--sans);cursor:pointer;text-transform:uppercase;letter-spacing:.05em;transition:color .15s,border-color .15s;}
-.top-tab:hover{color:var(--t2);}
-.top-tab.active{color:var(--amber);border-bottom-color:var(--amber);}
+/* ── Tab Bar ── */
+.tab-bar{
+  background:var(--surface-1);border-bottom:1px solid var(--line);
+  padding:0 24px;height:var(--tab-h);
+  display:flex;align-items:stretch;gap:2px;flex-shrink:0;overflow-x:auto;
+}
+.tab-bar::-webkit-scrollbar{height:0;}
+.tab-btn{
+  background:transparent;border:none;border-bottom:2px solid transparent;
+  padding:0 14px;color:var(--text-3);font:600 12px var(--sans);cursor:pointer;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+  transition:color .15s,border-color .15s;
+  letter-spacing:.01em;flex-shrink:0;
+}
+.tab-btn:hover{color:var(--text-2);}
+.tab-btn.active{color:var(--amber);border-bottom-color:var(--amber);}
+.tab-badge{
+  font:700 9px var(--mono);padding:1px 5px;border-radius:10px;
+  background:var(--surface-3);color:var(--text-3);
+}
+.tab-btn.active .tab-badge{background:var(--amber-dim);color:var(--amber);}
 
-/* Panel */
-.panel{display:none;flex:1;overflow:hidden;flex-direction:column;}
-.panel.active{display:flex;}
+/* ── Content Area ── */
+.content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.tab-panel{display:none;flex:1;overflow-y:auto;padding:20px 24px;}
+.tab-panel.active{display:block;}
 
-/* ── Master panel ── */
-.master-scroll{flex:1;overflow-y:auto;padding:24px;}
-.master-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px;}
-.stat-card{background:var(--s2);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;position:relative;overflow:hidden;}
-.stat-label{font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;}
-.stat-value{font:800 34px var(--sans);letter-spacing:-.05em;line-height:1;}
-.stat-sub{font:400 11px var(--mono);color:var(--t3);margin-top:6px;}
-.stat-card.amber .stat-value{color:var(--amber);}
-.stat-card.green .stat-value{color:var(--green);}
-.stat-card.blue  .stat-value{color:var(--blue);}
-.section-title{font:800 14px var(--sans);letter-spacing:-.03em;margin-bottom:12px;}
-.sync-status-box{background:var(--s2);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .3s;}
-.sync-dot.ok{background:var(--green);}
-.sync-dot.err{background:var(--red);}
-.sync-dot.warn{background:var(--amber);}
-.sync-label{font:600 12px var(--sans);color:var(--t2);flex:1;}
-.sync-time{font:400 11px var(--mono);color:var(--t3);}
+/* ── Summary Cards ── */
+.cards-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;
+  margin-bottom:24px;
+}
+.card{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:18px 20px;
+  position:relative;overflow:hidden;
+}
+.card-label{font:700 9px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;}
+.card-value{font:800 32px var(--sans);letter-spacing:-.05em;line-height:1;}
+.card-sub{font:400 11px var(--mono);color:var(--text-3);margin-top:6px;}
+.card.amber .card-value{color:var(--amber);}
+.card.green .card-value{color:var(--green);}
+.card.red   .card-value{color:var(--red);}
+.card.blue  .card-value{color:var(--blue);}
+.card.purple .card-value{color:var(--purple);}
+.card-accent{
+  position:absolute;top:-20px;right:-20px;
+  width:80px;height:80px;border-radius:50%;
+  opacity:.05;
+}
+.card.amber  .card-accent{background:var(--amber);}
+.card.green  .card-accent{background:var(--green);}
+.card.red    .card-accent{background:var(--red);}
+.card.blue   .card-accent{background:var(--blue);}
+.card.purple .card-accent{background:var(--purple);}
 
-/* ── DB Explorer panel ── */
-.db-tabs{display:flex;gap:0;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--s1);flex-shrink:0;}
-.db-tab{max-width:160px;flex:0 0 auto;padding:7px 14px;border:1px solid var(--line-mid);background:transparent;color:var(--t3);font:700 11px var(--mono);cursor:pointer;text-align:center;text-transform:uppercase;letter-spacing:.05em;transition:all .15s;}
-.db-tab:first-child{border-radius:var(--r) 0 0 var(--r);}
-.db-tab:last-child{border-radius:0 var(--r) var(--r) 0;}
-.db-tab:not(:first-child){border-left:none;}
-.db-tab.active{background:var(--amber-dim);border-color:var(--amber);color:var(--amber);}
-.db-layout{display:grid;grid-template-columns:220px 1fr;flex:1;overflow:hidden;}
-.db-sidebar{background:var(--s1);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;}
-.db-sidebar-head{padding:10px 12px;border-bottom:1px solid var(--line);flex-shrink:0;}
-.db-sidebar-label{font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;justify-content:space-between;}
-.db-table-count{font:700 10px var(--mono);color:var(--amber);background:var(--amber-dim);padding:1px 6px;border-radius:10px;}
-.db-tables-list{flex:1;overflow-y:auto;padding:6px;}
-.db-table-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .1s;font:400 11px var(--mono);color:var(--t2);}
-.db-table-item:hover{background:var(--s3);}
-.db-table-item.active{background:var(--s3);color:var(--amber);}
-.db-table-item-rows{font:700 9px var(--mono);color:var(--t3);background:var(--s4);padding:1px 5px;border-radius:4px;flex-shrink:0;margin-left:auto;}
-.remote-creds{padding:10px 12px;border-bottom:1px solid var(--line);background:var(--s2);flex-shrink:0;display:none;flex-direction:column;gap:6px;}
-.remote-creds.show{display:flex;}
-.cred-label{font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;}
-.cred-input{width:100%;padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:var(--s1);color:var(--t1);font:400 11px var(--mono);outline:none;transition:border-color .2s;}
-.cred-input:focus{border-color:var(--amber);}
-.cred-input::placeholder{color:var(--t3);}
-.connect-btn{width:100%;padding:7px;border-radius:6px;border:1px solid var(--amber);background:var(--amber-dim);color:var(--amber);font:700 10px var(--mono);cursor:pointer;text-transform:uppercase;letter-spacing:.06em;}
-.connect-btn:hover{filter:brightness(1.15);}
-.db-main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
-.db-toolbar{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-shrink:0;background:var(--s1);}
-.query-input{flex:1;background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:8px 12px;color:var(--t1);font:400 12px var(--mono);outline:none;transition:border-color .2s;}
-.query-input:focus{border-color:var(--amber);}
-.query-input::placeholder{color:var(--t3);}
-.run-btn{background:linear-gradient(135deg,var(--amber),#c08520);border:none;border-radius:var(--r);padding:8px 16px;color:#1a0f00;font:700 12px var(--sans);cursor:pointer;flex-shrink:0;}
-.run-btn:hover{filter:brightness(1.1);}
-.export-btn{background:transparent;border:1px solid var(--line-mid);border-radius:var(--r);padding:8px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;flex-shrink:0;}
-.export-btn:hover{border-color:var(--t2);}
-.results-wrap{flex:1;overflow:auto;}
-.results-meta{padding:6px 14px;font:400 10px var(--mono);color:var(--t3);border-bottom:1px solid var(--line);background:var(--s1);}
-.db-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--t3);}
-.db-empty-icon{font-size:28px;opacity:.4;}
-.db-empty p{font:400 12px var(--mono);}
-.db-error-msg{padding:16px;font:400 12px var(--mono);color:var(--red);background:var(--red-dim);margin:12px;border-radius:var(--r);}
-.db-loading{display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--t3);font:400 12px var(--mono);}
-.spinner{width:18px;height:18px;border:2px solid var(--s4);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
-table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);}
-thead th{background:var(--s2);font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;z-index:1;}
-tbody tr{border-bottom:1px solid var(--line);transition:background .1s;}
+/* ── Source Status Bars ── */
+.sources-row{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;}
+.source-pill{
+  display:flex;align-items:center;gap:7px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:20px;padding:6px 12px;
+  font:400 11px var(--mono);color:var(--text-2);
+}
+.source-pill .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.source-pill.ok   .dot{background:var(--green);}
+.source-pill.err  .dot{background:var(--red);}
+.source-pill.warn .dot{background:var(--amber);}
+
+/* ── Toolbar (search/filter) ── */
+.toolbar{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;
+}
+.search-box{
+  background:var(--surface-2);border:1px solid var(--line-mid);
+  border-radius:var(--radius);padding:8px 12px;
+  color:var(--text-1);font:400 13px var(--sans);
+  width:260px;transition:border-color .2s;
+}
+.search-box:focus{outline:none;border-color:var(--amber);}
+.search-box::placeholder{color:var(--text-3);}
+.filter-select{
+  background:var(--surface-2);border:1px solid var(--line-mid);
+  border-radius:var(--radius);padding:8px 10px;
+  color:var(--text-2);font:600 12px var(--sans);cursor:pointer;
+  transition:border-color .2s;
+}
+.filter-select:focus{outline:none;border-color:var(--amber);}
+.toolbar-count{font:400 11px var(--mono);color:var(--text-3);margin-left:auto;}
+
+/* ── Master Table ── */
+.table-wrap{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-lg);overflow:hidden;
+}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{
+  background:var(--surface-3);
+  font:700 9px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;
+  padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);
+  white-space:nowrap;position:sticky;top:0;z-index:1;
+}
+thead th:first-child{border-radius:0;}
+tbody tr{border-bottom:1px solid var(--line);transition:background .1s;cursor:pointer;}
 tbody tr:last-child{border-bottom:none;}
-tbody tr:hover{background:var(--s2);}
-tbody td{padding:7px 12px;color:var(--t2);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-tbody td.null-val{color:var(--t3);font-style:italic;}
-.pagination{padding:8px 14px;border-top:1px solid var(--line);background:var(--s1);display:none;align-items:center;gap:8px;flex-shrink:0;}
-.page-btn{background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:5px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;}
-.page-btn:hover:not(:disabled){border-color:var(--amber);color:var(--amber);}
-.page-btn:disabled{opacity:.4;cursor:default;}
-.page-info{font:400 11px var(--mono);color:var(--t3);}
-.page-range{font:400 10px var(--mono);color:var(--t3);margin-left:auto;}
+tbody tr:hover{background:var(--surface-3);}
+tbody td{padding:9px 14px;color:var(--text-2);vertical-align:middle;}
+tbody td.name{font:700 13px var(--sans);color:var(--text-1);letter-spacing:-.02em;}
+tbody td.mono{font:400 11px var(--mono);}
+
+/* ── Status Badge ── */
+.badge{
+  display:inline-flex;align-items:center;
+  font:700 9px var(--mono);padding:2px 7px;border-radius:4px;
+  text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;
+}
+.badge.green {background:var(--green-dim); color:var(--green);}
+.badge.amber {background:var(--amber-dim); color:var(--amber);}
+.badge.red   {background:var(--red-dim);   color:var(--red);}
+.badge.blue  {background:var(--blue-dim);  color:var(--blue);}
+.badge.grey  {background:var(--surface-4); color:var(--text-3);}
+.badge.purple{background:var(--purple-dim);color:var(--purple);}
+
+/* ── Expandable Row Detail ── */
+.row-detail{
+  display:none;background:var(--surface-1);
+  border-bottom:1px solid var(--line);
+}
+.row-detail.open{display:table-row;}
+.row-detail td{padding:16px 20px;}
+.detail-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;
+}
+.detail-section{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius);padding:14px 16px;
+}
+.detail-section-title{
+  font:700 9px var(--mono);color:var(--text-3);text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:10px;
+}
+.detail-row{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px;}
+.detail-key{font:400 11px var(--mono);color:var(--text-3);}
+.detail-val{font:600 11px var(--sans);color:var(--text-1);text-align:right;}
+.tag-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.tag-chip{
+  font:700 9px var(--mono);padding:2px 7px;border-radius:4px;
+  background:var(--blue-dim);color:var(--blue);text-transform:uppercase;
+}
+.tag-chip.done{background:var(--green-dim);color:var(--green);}
+
+/* ── Empty State ── */
+.empty-state{
+  text-align:center;padding:60px 20px;
+  font:400 12px var(--mono);color:var(--text-3);
+}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:.5;}
+
+/* ── Loading State ── */
+.loading-overlay{
+  position:fixed;inset:0;background:var(--bg);z-index:150;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
+.loading-spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--surface-4);
+  border-top-color:var(--amber);
+  animation:spin 0.8s linear infinite;
+}
+.loading-msg{font:400 12px var(--mono);color:var(--text-3);}
+
+/* ── Section title ── */
+.section-title{
+  font:800 14px var(--sans);color:var(--text-1);letter-spacing:-.03em;
+  margin-bottom:12px;margin-top:4px;
+}
+.section-sub{font:400 11px var(--mono);color:var(--text-3);margin-top:2px;margin-bottom:16px;}
+
+/* ── Split layout for overview ── */
+.overview-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+@media(max-width:900px){.overview-split{grid-template-columns:1fr;}}
+.overview-panel{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:18px 20px;
+}
+.overview-panel-title{
+  font:700 9px var(--mono);color:var(--text-3);text-transform:uppercase;
+  letter-spacing:.12em;margin-bottom:14px;
+}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-label{font:400 11px var(--mono);color:var(--text-2);width:100px;flex-shrink:0;text-transform:capitalize;}
+.bar-track{flex:1;height:6px;background:var(--surface-4);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;background:var(--amber);transition:width .4s ease;}
+.bar-val{font:700 10px var(--mono);color:var(--text-3);width:30px;text-align:right;flex-shrink:0;}
+
+/* ── Analyses table specifics ── */
+.analyses-col{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ── Config modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.hidden{display:none!important;}
+.modal{
+  background:var(--surface-2);border:1px solid var(--line-mid);
+  border-radius:var(--radius-lg);padding:28px 32px;
+  width:100%;max-width:480px;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+.modal-title{font:800 18px var(--sans);letter-spacing:-.04em;margin-bottom:4px;}
+.modal-sub{font:400 11px var(--mono);color:var(--text-3);margin-bottom:20px;}
+.form-label{font:700 10px var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:block;}
+.form-input{
+  width:100%;background:var(--surface-3);border:1px solid var(--line-mid);
+  border-radius:var(--radius);padding:10px 13px;
+  color:var(--text-1);font:400 13px var(--mono);margin-bottom:14px;
+  transition:border-color .2s;
+}
+.form-input:focus{outline:none;border-color:var(--amber);}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
+.btn-secondary{
+  background:transparent;border:1px solid var(--line-mid);border-radius:var(--radius);
+  padding:9px 18px;color:var(--text-2);font:600 12px var(--sans);cursor:pointer;
+  transition:all .12s;
+}
+.btn-secondary:hover{border-color:var(--text-2);}
+.btn-primary{
+  background:linear-gradient(135deg,var(--amber),#c08520);border:none;
+  border-radius:var(--radius);padding:9px 18px;
+  color:#1a0f00;font:700 12px var(--sans);cursor:pointer;transition:filter .15s;
+}
+.btn-primary:hover{filter:brightness(1.1);}
+
+/* ── Tooltip ── */
+[title]{cursor:help;}
 </style>
 </head>
 <body>
 
-<!-- Auth -->
+<!-- ═══════════ AUTH SCREEN ═══════════ -->
 <div class="auth-screen" id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">AR</div>
     <div class="auth-title">ARMF Viewer</div>
-    <div class="auth-sub">Master Database</div>
-    <input class="auth-input" id="auth-pin" type="password" placeholder="• • • • • •"
-      maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="auth-sub">Master Database — Read Only</div>
+
+    <input class="auth-input" id="auth-pin" type="password" style="margin-top:20px;"
+      placeholder="• • • • • •" maxlength="20" autocomplete="off"
+      onkeydown="if(event.key==='Enter')doLogin()">
     <button class="auth-btn" onclick="doLogin()">Connect</button>
     <div class="auth-err hidden" id="auth-err"></div>
   </div>
 </div>
 
-<!-- App -->
-<div class="app hidden" id="app">
+<!-- ═══════════ LOADING ═══════════ -->
+<div class="loading-overlay hidden" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg" id="loading-msg">Fetching master database…</div>
+</div>
 
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div class="hidden" id="app">
+
+  <!-- Header -->
   <div class="header">
     <div class="header-mark">AR</div>
     <div>
       <div class="header-title">ARMF Viewer</div>
       <div class="header-sub">Master Database</div>
     </div>
+    <div class="status-dot" id="api-dot" title="API status"></div>
+    <span class="fetch-time" id="fetch-time"></span>
     <div class="header-spacer"></div>
-    <button class="header-btn" id="sync-btn" onclick="doSync()">
+    <span class="header-pill" id="cage-count-pill">— cages</span>
+    <button class="refresh-btn" id="refresh-btn" onclick="loadData()">
+      <svg id="refresh-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M10.5 1.5A5 5 0 1 0 11 6" stroke-linecap="round"/>
+        <polyline points="11,1 11,4 8,4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Refresh
+    </button>
+    <button class="refresh-btn" id="sync-btn" onclick="doSync()" title="Pull latest data from all sources into the master database">
       <svg id="sync-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M1.5 6A4.5 4.5 0 0 1 9 2.4" stroke-linecap="round"/>
         <path d="M10.5 6A4.5 4.5 0 0 1 3 9.6" stroke-linecap="round"/>
         <polyline points="9,1 9,3.5 11,3.5" stroke-linecap="round" stroke-linejoin="round"/>
         <polyline points="3,8.5 1,8.5 1,11" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Sync Master
+      Sync
+    </button>
+    <span class="fetch-time" id="sync-time"></span>
+    <button class="refresh-btn" onclick="openConfig()" title="Settings" style="padding:6px 10px;">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="6.5" cy="6.5" r="2"/>
+        <path d="M6.5 1v1.5M6.5 10.5V12M1 6.5h1.5M10.5 6.5H12M2.6 2.6l1.1 1.1M9.3 9.3l1.1 1.1M9.3 3.7l-1.1 1.1M3.7 9.3l-1.1 1.1" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="refresh-btn" onclick="runDiagnostics()" title="Run connection diagnostics" style="padding:6px 10px;">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="6.5" cy="6.5" r="5.5"/>
+        <line x1="6.5" y1="4" x2="6.5" y2="6.5" stroke-linecap="round"/>
+        <circle cx="6.5" cy="9" r="0.6" fill="currentColor"/>
+      </svg>
     </button>
     <button class="logout-btn" onclick="doLogout()">Sign out</button>
   </div>
 
-  <!-- Top-level tab bar -->
-  <div class="top-tabs">
-    <button class="top-tab active" id="ttab-master"   onclick="setTopTab('master')">⬡ Master</button>
-    <button class="top-tab"        id="ttab-explorer" onclick="setTopTab('explorer')">▤ DB Explorer</button>
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-btn-overview"   onclick="switchTab('overview')">Overview</button>
+    <button class="tab-btn"        id="tab-btn-cages"      onclick="switchTab('cages')">
+      Cages <span class="tab-badge" id="badge-cages">—</span>
+    </button>
+    <button class="tab-btn"        id="tab-btn-factory"    onclick="switchTab('factory')">
+      Factory <span class="tab-badge" id="badge-factory">—</span>
+    </button>
+    <button class="tab-btn"        id="tab-btn-shipments"  onclick="switchTab('shipments')">
+      Shipments <span class="tab-badge" id="badge-shipments">—</span>
+    </button>
+    <button class="tab-btn"        id="tab-btn-movements"  onclick="switchTab('movements')">
+      Movements <span class="tab-badge" id="badge-movements">—</span>
+    </button>
+    <button class="tab-btn"        id="tab-btn-boattrips"  onclick="switchTab('boattrips')">
+      Boat Trips <span class="tab-badge" id="badge-boattrips">—</span>
+    </button>
+    <button class="tab-btn"        id="tab-btn-analyses"   onclick="switchTab('analyses')">
+      Model DB <span class="tab-badge" id="badge-analyses">—</span>
+    </button>
+    <button class="tab-btn"        id="tab-btn-audit"      onclick="switchTab('audit')">
+      Audit Log <span class="tab-badge" id="badge-audit">—</span>
+    </button>
   </div>
 
-  <!-- ── MASTER PANEL ── -->
-  <div class="panel active" id="panel-master">
-    <div class="master-scroll">
+  <!-- Content -->
+  <div class="content">
 
-      <div class="sync-status-box">
-        <div class="sync-dot" id="sync-dot"></div>
-        <div class="sync-label" id="sync-label">Loading sync status…</div>
-        <div class="sync-time" id="sync-time"></div>
+    <!-- ── Overview ── -->
+    <div class="tab-panel active" id="tab-panel-overview">
+      <div class="sources-row" id="sources-row"></div>
+      <div class="cards-grid" id="overview-cards"></div>
+      <div class="overview-split">
+        <div class="overview-panel">
+          <div class="overview-panel-title">Cages by Status</div>
+          <div id="status-bars"></div>
+        </div>
+        <div class="overview-panel">
+          <div class="overview-panel-title">Cages by Location</div>
+          <div id="location-bars"></div>
+        </div>
       </div>
-
-      <div class="master-grid" id="master-cards"></div>
-
-      <div class="section-title">What the Master DB holds</div>
-      <p style="font:400 12px var(--mono);color:var(--t3);line-height:1.8;margin-bottom:20px">
-        The <strong style="color:var(--amber)">armf-master</strong> D1 database is a complete mirror of two sources:<br>
-        <span style="color:var(--t2)">① Cage Tool DB</span> — every table copied as <code style="color:var(--amber)">cage_{tablename}</code><br>
-        <span style="color:var(--t2)">② Remote DB</span> — every table copied as <code style="color:var(--amber)">remote_{tablename}</code><br><br>
-        To sync: go to <strong style="color:var(--t2)">DB Explorer → Remote DB</strong> tab and enter your Account ID + Database UUID, then come back here and click <strong style="color:var(--amber)">Sync Master</strong>.<br>
-        Mesh weights for the cage tool and cage traveller are served from <code style="color:var(--amber)">remote_analyses</code> in this master DB.
-      </p>
-
-      <div class="section-title">Mesh Weights Preview</div>
-      <div id="mesh-preview" style="font:400 11px var(--mono);color:var(--t3);padding:12px;background:var(--s2);border:1px solid var(--line);border-radius:var(--r-lg)">
-        Loading…
-      </div>
-    </div>
-  </div>
-
-  <!-- ── DB EXPLORER PANEL ── -->
-  <div class="panel" id="panel-explorer">
-
-    <!-- DB source tabs -->
-    <div class="db-tabs">
-      <button class="db-tab active" id="dbtab-cage"   onclick="setDbTarget('cage')">▤ Cage Tool DB</button>
-      <button class="db-tab"        id="dbtab-armf"   onclick="setDbTarget('armf')">⬡ Master DB</button>
-      <button class="db-tab"        id="dbtab-remote" onclick="setDbTarget('remote')">⇄ Remote DB</button>
+      <div class="section-title">Recent Audit Events</div>
+      <div class="table-wrap" id="recent-audit-wrap"></div>
     </div>
 
-    <div class="db-layout">
-      <div class="db-sidebar">
-
-        <!-- Remote creds (shown only for remote tab) -->
-        <div class="remote-creds" id="remote-creds">
-          <div class="cred-label">Remote Database</div>
-          <input class="cred-input" id="cred-account-id" placeholder="Account ID (32-char hex)"
-            oninput="saveRemoteCreds()" autocomplete="off">
-          <input class="cred-input" id="cred-db-uuid" placeholder="Database UUID"
-            oninput="saveRemoteCreds()" autocomplete="off">
-          <button class="connect-btn" onclick="loadTables()">⇄ Connect</button>
-        </div>
-
-        <div class="db-sidebar-head">
-          <div class="db-sidebar-label">
-            Tables
-            <span class="db-table-count" id="table-count">—</span>
-          </div>
-        </div>
-        <div class="db-tables-list" id="tables-list">
-          <div class="db-empty" style="height:80px"><p>—</p></div>
-        </div>
+    <!-- ── Cages ── -->
+    <div class="tab-panel" id="tab-panel-cages">
+      <div class="toolbar">
+        <input class="search-box" id="cage-search" type="text" placeholder="Search cages…"
+          oninput="renderCages()">
+        <select class="filter-select" id="cage-filter-status" onchange="renderCages()">
+          <option value="">All statuses</option>
+        </select>
+        <select class="filter-select" id="cage-filter-location" onchange="renderCages()">
+          <option value="">All locations</option>
+        </select>
+        <select class="filter-select" id="cage-filter-cstatus" onchange="renderCages()">
+          <option value="">Cage status (tag)</option>
+          <option value="red">Red tag</option>
+          <option value="green">Green tag</option>
+        </select>
+        <span class="toolbar-count" id="cage-count-label"></span>
       </div>
+      <div class="table-wrap">
+        <table id="cage-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Tag</th>
+              <th>VST Area</th>
+              <th>Shifts Req</th>
+              <th>Shifts Done</th>
+              <th>Departure</th>
+              <th>Live Need</th>
+              <th>Factory Location</th>
+              <th>In RMD</th>
+            </tr>
+          </thead>
+          <tbody id="cage-tbody"></tbody>
+        </table>
+      </div>
+    </div>
 
-      <div class="db-main">
-        <div class="db-toolbar">
-          <input class="query-input" id="query-input" placeholder="SELECT * FROM table_name LIMIT 100"
-            onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey))runQuery()">
-          <button class="run-btn" onclick="runQuery()">▶ Run</button>
-          <button class="export-btn hidden" id="export-btn" onclick="exportCSV()">⬇ CSV</button>
-        </div>
-        <div class="results-meta hidden" id="results-meta"></div>
-        <div class="results-wrap" id="results-wrap">
-          <div class="db-empty"><div class="db-empty-icon">⬡</div><p>Select a table or run a SQL query.</p></div>
-        </div>
-        <div class="pagination" id="pagination">
-          <button class="page-btn" id="prev-btn" onclick="changePage(-1)" disabled>← Prev</button>
-          <span class="page-info" id="page-info"></span>
-          <button class="page-btn" id="next-btn" onclick="changePage(1)">Next →</button>
-          <span class="page-range" id="page-range"></span>
+    <!-- ── Factory ── -->
+    <div class="tab-panel" id="tab-panel-factory">
+      <div class="toolbar">
+        <input class="search-box" id="factory-search" type="text" placeholder="Search cage / tags…"
+          oninput="renderFactory()">
+        <span class="toolbar-count" id="factory-count-label"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="factory-table">
+          <thead>
+            <tr>
+              <th>Cage</th>
+              <th>Factory Location</th>
+              <th>Tags</th>
+              <th>Custom Fields</th>
+              <th>Meshes</th>
+              <th>Last Updated</th>
+              <th>Field View Link</th>
+            </tr>
+          </thead>
+          <tbody id="factory-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Shipments ── -->
+    <div class="tab-panel" id="tab-panel-shipments">
+      <div class="section-title">Shipments</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Destination</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="shipments-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:24px;">
+        <div class="section-title">Boat Trips</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Trip</th>
+                <th>Load Date</th>
+                <th>Depart Date</th>
+                <th>Unload Date</th>
+                <th>Return Date</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="boattrips-tbody2"></tbody>
+          </table>
         </div>
       </div>
     </div>
-  </div>
 
+    <!-- ── Movements ── -->
+    <div class="tab-panel" id="tab-panel-movements">
+      <div class="toolbar">
+        <input class="search-box" id="movement-search" type="text" placeholder="Search movements…"
+          oninput="renderMovements()">
+        <select class="filter-select" id="movement-filter-status" onchange="renderMovements()">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="complete">Complete</option>
+        </select>
+        <span class="toolbar-count" id="movement-count-label"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Shift</th>
+              <th>Type</th>
+              <th>Cage</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Notes</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="movements-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Boat Trips (tab) ── -->
+    <div class="tab-panel" id="tab-panel-boattrips">
+      <div class="section-title">Boat Trips</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Load Date</th>
+              <th>Depart Date</th>
+              <th>Unload Date</th>
+              <th>Return Date</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="boattrips-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Model DB ── -->
+    <div class="tab-panel" id="tab-panel-analyses">
+      <div class="toolbar">
+        <input class="search-box" id="analyses-search" type="text" placeholder="Search model DB…"
+          oninput="renderAnalyses()">
+        <span class="toolbar-count" id="analyses-count-label"></span>
+      </div>
+      <div id="analyses-source-msg" class="empty-state hidden">
+        <div class="empty-icon">⬡</div>
+        <p>Model DB not configured.<br>Set REMOTE_DB_TOKEN, REMOTE_ACCOUNT_ID, REMOTE_DB_UUID in the worker.</p>
+      </div>
+      <div class="table-wrap" id="analyses-table-wrap">
+        <table id="analyses-table">
+          <thead id="analyses-thead"></thead>
+          <tbody id="analyses-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Audit Log ── -->
+    <div class="tab-panel" id="tab-panel-audit">
+      <div class="toolbar">
+        <input class="search-box" id="audit-search" type="text" placeholder="Search events…"
+          oninput="renderAudit()">
+        <span class="toolbar-count" id="audit-count-label"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody id="audit-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
 </div><!-- /app -->
 
+<!-- ═══════════ CONFIG MODAL ═══════════ -->
+<div class="modal-overlay hidden" id="config-modal">
+  <div class="modal">
+    <div class="modal-title">Connection Settings</div>
+    <div class="modal-sub">Update your ARMF access PIN</div>
+    <label class="form-label">ARMF PIN</label>
+    <input class="form-input" id="config-pin" type="password" placeholder="Enter PIN">
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeConfig()">Cancel</button>
+      <button class="btn-primary" onclick="saveConfig()">Save & Reconnect</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DIAGNOSTICS MODAL ═══════════ -->
+<div class="modal-overlay hidden" id="diag-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-title">Connection Diagnostics</div>
+    <div class="modal-sub">Live test of every secret and connection</div>
+    <div id="diag-content" style="margin-top:4px;">
+      <div style="font:400 12px var(--mono);color:var(--text-3);text-align:center;padding:20px">Running tests…</div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="document.getElementById('diag-modal').classList.add('hidden')">Close</button>
+      <button class="btn-primary" onclick="runDiagnostics()">Re-run</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const API_URL  = 'https://armf-viewer.exposurephotographer0.workers.dev';
-const LS_PIN   = 'armf_pin';
-const PAGE_SZ  = 200;
+async function runDiagnostics() {
+  const modal   = document.getElementById('diag-modal');
+  const content = document.getElementById('diag-content');
+  modal.classList.remove('hidden');
+  content.innerHTML = '<div style="font:400 12px var(--mono);color:var(--text-3);text-align:center;padding:20px">Running tests…</div>';
+  try {
+    const res  = await fetch(`${API_URL}/api/diagnostics`, { headers: authHeader() });
+    const data = await res.json();
+    content.innerHTML = renderDiag(data);
+  } catch(e) {
+    content.innerHTML = `<div style="font:400 12px var(--mono);color:var(--red);padding:8px">Failed to reach worker: ${escHtml(e.message)}</div>`;
+  }
+}
 
-let _pin    = '';
-let _dbTgt  = 'cage';
-let _data   = [];
-let _page   = 0;
-let _ms     = 0;
+function renderDiag(d) {
+  const rows = (obj) => Object.entries(obj).map(([k,v]) => {
+    const isOk  = v === true || v === '(set)' || v === '(using default)';
+    const isErr = v === '(NOT SET)' || v === false;
+    const col   = isOk ? 'var(--green)' : isErr ? 'var(--red)' : 'var(--text-2)';
+    return `<div class="detail-row">
+      <span class="detail-key">${escHtml(k)}</span>
+      <span style="font:600 11px var(--mono);color:${col}">${escHtml(String(v))}</span>
+    </div>`;
+  }).join('');
 
-const ah = () => _pin ? {'Authorization':`Bearer ${_pin}`} : {};
+  const test = (label, t) => {
+    if (!t) return '';
+    const ok  = t.ok === true || (t.status >= 200 && t.status < 300);
+    const col = ok ? 'var(--green)' : 'var(--red)';
+    let detail = '';
+    if (t.error)        detail = `<div style="color:var(--red);margin-top:4px;font-size:10px">${escHtml(t.error)}</div>`;
+    if (t.status)       detail += `<div style="color:var(--text-3);font-size:10px">HTTP ${t.status}</div>`;
+    if (t.bodyPreview)  detail += `<div style="color:var(--text-3);font-size:10px;word-break:break-all;margin-top:2px">${escHtml(t.bodyPreview)}</div>`;
+    if (t.tables)       detail += `<div style="color:var(--text-3);font-size:10px;margin-top:2px">Tables: ${t.tables.join(', ')||'none'}</div>`;
+    if (t.missing)      detail += `<div style="color:var(--red);font-size:10px;margin-top:2px">Missing: ${t.missing.join(', ')}</div>`;
+    if (t.errors?.length) detail += `<div style="color:var(--red);font-size:10px;margin-top:2px">${escHtml(JSON.stringify(t.errors))}</div>`;
+    if (t.skipped)      detail += `<div style="color:var(--amber);font-size:10px;margin-top:2px">Skipped — missing secrets above</div>`;
+    return `<div style="margin-bottom:10px">
+      <div style="font:700 11px var(--mono);color:${col};margin-bottom:3px">
+        ${ok ? '✓' : '✗'} ${escHtml(label)}
+      </div>
+      ${detail}
+    </div>`;
+  };
 
-// ── Auth ──────────────────────────────────────────────────────────────
+  return `
+    <div class="detail-section" style="margin-bottom:12px">
+      <div class="detail-section-title">Secrets / Bindings</div>
+      ${rows(d.secrets)}
+      <div class="detail-row">
+        <span class="detail-key">ARMF_DB binding</span>
+        <span style="font:600 11px var(--mono);color:${d.armf_db?'var(--green)':'var(--red)'}">${d.armf_db ? 'Bound' : 'NOT BOUND'}</span>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Connection Tests</div>
+      ${test('Cage DB (direct D1 read)', d.tests?.cage_db)}
+      ${test('Model DB (external D1)', d.tests?.external_d1)}
+      ${test('ARMF Master D1', d.tests?.armf_db)}
+    </div>`;
+}
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+const API_URL = 'https://armf-viewer.exposurephotographer0.workers.dev';
+const LS_PIN  = 'armf_pin';
+
+let API_PIN = '';
+let MASTER  = null;   // last fetched master payload
+
+function authHeader() {
+  return API_PIN ? { 'Authorization': `Bearer ${API_PIN}` } : {};
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  const s = localStorage.getItem(LS_PIN);
-  if (s) { _pin = s; showApp(); }
+  const savedPin = localStorage.getItem(LS_PIN) || '';
+  if (savedPin) {
+    API_PIN = savedPin;
+    showApp();
+  }
 });
 
 async function doLogin() {
   const pinEl = document.getElementById('auth-pin');
   const errEl = document.getElementById('auth-err');
   const pin   = pinEl.value.trim();
+
   errEl.classList.add('hidden');
-  if (!pin) { showAE('Please enter your PIN'); return; }
+  if (!pin) { showErr(errEl, 'Please enter the PIN'); return; }
+
   try {
-    const r = await fetch(`${API_URL}/api/auth`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});
-    const d = await r.json();
-    if (d.ok) { _pin=pin; localStorage.setItem(LS_PIN,pin); showApp(); }
-    else showAE(d.error||'Incorrect PIN');
-  } catch { showAE('Could not reach the ARMF Worker'); }
+    const res  = await fetch(`${API_URL}/api/auth`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ pin }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      API_PIN = pin;
+      localStorage.setItem(LS_PIN, pin);
+      showApp();
+    } else {
+      showErr(errEl, data.error || 'Incorrect PIN');
+    }
+  } catch(e) {
+    showErr(errEl, 'Could not reach the ARMF Worker — check your network connection');
+  }
 }
-function showAE(m){const e=document.getElementById('auth-err');e.textContent=m;e.classList.remove('hidden');}
-function showApp(){
+
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function showApp() {
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  loadRemoteCreds();
-  loadSyncStatus();
-  loadMeshPreview();
-}
-function doLogout(){localStorage.removeItem(LS_PIN);_pin='';document.getElementById('app').classList.add('hidden');document.getElementById('auth-screen').classList.remove('hidden');document.getElementById('auth-pin').value='';}
-
-// ── Top tabs ──────────────────────────────────────────────────────────
-function setTopTab(t) {
-  ['master','explorer'].forEach(id => {
-    document.getElementById('ttab-'+id).classList.toggle('active', id===t);
-    document.getElementById('panel-'+id).classList.toggle('active', id===t);
-  });
-  if (t==='explorer' && _dbTgt==='cage') loadTables();
+  loadData();
 }
 
-// ── Sync ──────────────────────────────────────────────────────────────
-async function doSync() {
-  const btn = document.getElementById('sync-btn');
+function doLogout() {
+  localStorage.removeItem(LS_PIN);
+  API_PIN = '';
+  MASTER  = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('auth-pin').value = '';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════════════════════════════════════
+async function loadData() {
+  const loadEl = document.getElementById('loading-overlay');
+  const msgEl  = document.getElementById('loading-msg');
+  const btn    = document.getElementById('refresh-btn');
+
+  loadEl.classList.remove('hidden');
   btn.classList.add('spinning');
-  setSyncStatus('syncing','Syncing all tables into master DB…','');
+  msgEl.textContent = 'Reading master database…';
 
-  // Get remote credentials from localStorage (same ones used in DB explorer)
-  const accountId = localStorage.getItem('armf_remote_account')||'';
-  const dbUuid    = localStorage.getItem('armf_remote_uuid')||'';
-
-  if (!accountId || !dbUuid) {
-    setSyncStatus('warn','Remote DB credentials not set — go to DB Explorer → Remote DB tab and enter Account ID + UUID first, then click Connect. After that, Sync Master will work.','');
+  try {
+    const res = await fetch(`${API_URL}/api/master`, { headers: authHeader() });
+    if (res.status === 401) { doLogout(); return; }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    MASTER = await res.json();
+    renderAll();
+    setApiDot('ok');
+    const t = MASTER.syncedAt || MASTER.fetchedAt;
+    document.getElementById('fetch-time').textContent =
+      t ? ('synced ' + new Date(t).toLocaleTimeString()) : '';
+  } catch(e) {
+    setApiDot('err');
+    document.getElementById('fetch-time').textContent = 'read error';
+    console.error('loadData error:', e);
+  } finally {
+    loadEl.classList.add('hidden');
     btn.classList.remove('spinning');
+  }
+}
+
+async function doSync() {
+  const btn     = document.getElementById('sync-btn');
+  const timeEl  = document.getElementById('sync-time');
+  const loadEl  = document.getElementById('loading-overlay');
+  const msgEl   = document.getElementById('loading-msg');
+
+  btn.classList.add('spinning');
+  loadEl.classList.remove('hidden');
+  msgEl.textContent = 'Syncing from all sources…';
+  timeEl.textContent = 'syncing…';
+
+  try {
+    const res  = await fetch(`${API_URL}/api/sync`, {
+      method: 'POST', headers: authHeader(),
+    });
+    if (res.status === 401) { doLogout(); return; }
+    const data = await res.json();
+    if (data.ok) {
+      timeEl.textContent = 'synced ' + new Date(data.syncedAt).toLocaleTimeString();
+      // Reload from DB now that it's fresh
+      await loadData();
+    } else {
+      timeEl.textContent = 'sync error';
+      console.error('Sync error:', data);
+    }
+  } catch(e) {
+    timeEl.textContent = 'sync failed';
+    console.error('doSync error:', e);
+  } finally {
+    btn.classList.remove('spinning');
+    loadEl.classList.add('hidden');
+  }
+}
+
+function setApiDot(state) {
+  const dot = document.getElementById('api-dot');
+  dot.className = 'status-dot ' + state;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════════════════════════════════
+function renderAll() {
+  if (!MASTER) return;
+  updateBadges();
+  renderOverview();
+  renderCages();
+  renderFactory();
+  renderShipments();
+  renderBoatTrips();
+  renderMovements();
+  renderAnalyses();
+  renderAudit();
+  populateFilters();
+}
+
+function updateBadges() {
+  const m = MASTER;
+  setBadge('cages',     (m.cages||[]).length);
+  setBadge('factory',   (m.cages||[]).filter(c=>c.factory).length);
+  setBadge('shipments', (m.shipments||[]).length);
+  setBadge('movements', (m.plannedMovements||[]).length);
+  setBadge('boattrips', (m.boatTrips||[]).length);
+  setBadge('analyses',  (m.analyses||[]).length);
+  setBadge('audit',     (m.auditEvents||[]).length);
+  document.getElementById('cage-count-pill').textContent =
+    `${(m.cages||[]).length} cages`;
+}
+
+function setBadge(id, count) {
+  const el = document.getElementById(`badge-${id}`);
+  if (el) el.textContent = count;
+}
+
+// ── Tab switching ──
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-panel-' + tab).classList.add('active');
+  document.getElementById('tab-btn-'   + tab).classList.add('active');
+}
+
+// ── Populate filter dropdowns ──
+function populateFilters() {
+  const cages = MASTER.cages || [];
+  const statuses  = [...new Set(cages.map(c => c.status || 'planned').filter(Boolean))].sort();
+  const locations = [...new Set(cages.map(c => c.location || 'facility').filter(Boolean))].sort();
+
+  fillSelect('cage-filter-status',   statuses,  'All statuses');
+  fillSelect('cage-filter-location', locations, 'All locations');
+}
+
+function fillSelect(id, options, placeholder) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o; opt.textContent = capitalize(o);
+    if (o === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// OVERVIEW
+// ═══════════════════════════════════════════════════════════════════════
+function renderOverview() {
+  const m = MASTER;
+  const cages = m.cages || [];
+
+  // Source pills
+  const srcRow = document.getElementById('sources-row');
+  srcRow.innerHTML = '';
+  if (m.sources) {
+    const mainOk  = m.sources.mainApi?.ok;
+    const extOk   = m.sources.modelDb?.ok;
+    addPill(srcRow, mainOk ? 'ok' : 'err',
+      mainOk ? 'Cage DB — Connected' : `Cage DB — ${m.sources.mainApi?.error||'Error'}`);
+    addPill(srcRow, extOk ? 'ok' : (m.sources.modelDb?.error?.includes('configured') ? 'warn' : 'err'),
+      extOk ? `Model DB — ${m.sources.modelDb.rows} rows`
+             : `Model DB — ${m.sources.modelDb?.error||'Error'}`);
+  }
+
+  // Summary cards
+  const cardsEl = document.getElementById('overview-cards');
+  const byStatus   = {};
+  const byLocation = {};
+  let withFactory  = 0;
+  for (const c of cages) {
+    const s = c.status || 'planned';
+    byStatus[s] = (byStatus[s]||0) + 1;
+    const l = c.location || 'facility';
+    byLocation[l] = (byLocation[l]||0) + 1;
+    if (c.factory) withFactory++;
+  }
+
+  cardsEl.innerHTML = [
+    makeCard('Total Cages',       cages.length,              'amber',  'across all locations'),
+    makeCard('With Factory Data', withFactory,               'green',  `of ${cages.length} cages`),
+    makeCard('Analyses Rows',     (m.analyses||[]).length,   'blue',   'from Model DB'),
+    makeCard('Shipments',         (m.shipments||[]).length,  'purple', ''),
+    makeCard('Movements',         (m.plannedMovements||[]).length, 'amber', 'planned'),
+    makeCard('Boat Trips',        (m.boatTrips||[]).length,  'green',  ''),
+    makeCard('Audit Events',      (m.auditEvents||[]).length,'blue',   ''),
+    makeCard('Frames',            (m.frames||[]).length,     'grey',   ''),
+  ].join('');
+
+  // Status bars
+  renderBars('status-bars',   byStatus,   cages.length);
+  renderBars('location-bars', byLocation, cages.length);
+
+  // Recent audit
+  renderRecentAudit();
+}
+
+function addPill(row, cls, text) {
+  const p = document.createElement('div');
+  p.className = `source-pill ${cls}`;
+  p.innerHTML = `<span class="dot"></span>${escHtml(text)}`;
+  row.appendChild(p);
+}
+
+function makeCard(label, value, color, sub) {
+  return `<div class="card ${color}">
+    <div class="card-accent"></div>
+    <div class="card-label">${label}</div>
+    <div class="card-value">${value}</div>
+    ${sub ? `<div class="card-sub">${sub}</div>` : ''}
+  </div>`;
+}
+
+function renderBars(containerId, map, total) {
+  const el = document.getElementById(containerId);
+  if (!total) { el.innerHTML = '<div style="font:400 11px var(--mono);color:var(--text-3)">No data</div>'; return; }
+  const sorted = Object.entries(map).sort((a,b) => b[1]-a[1]);
+  el.innerHTML = sorted.map(([key, count]) => `
+    <div class="bar-row">
+      <div class="bar-label">${escHtml(capitalize(key))}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/total*100)}%"></div></div>
+      <div class="bar-val">${count}</div>
+    </div>`).join('');
+}
+
+function renderRecentAudit() {
+  const events = (MASTER.auditEvents || []).slice(0, 8);
+  const wrap   = document.getElementById('recent-audit-wrap');
+  if (!events.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No audit events</p></div>`;
+    return;
+  }
+  wrap.innerHTML = `<table>
+    <thead><tr><th>Date</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>${events.map(e => `
+      <tr>
+        <td class="mono">${fmtDate(e.date || e.timestamp)}</td>
+        <td>${badgeForType(e.type)}</td>
+        <td>${escHtml(e.description||'')}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CAGES
+// ═══════════════════════════════════════════════════════════════════════
+function renderCages() {
+  if (!MASTER) return;
+  const q       = (document.getElementById('cage-search')?.value || '').toLowerCase();
+  const fStatus = document.getElementById('cage-filter-status')?.value   || '';
+  const fLoc    = document.getElementById('cage-filter-location')?.value  || '';
+  const fCStatus= document.getElementById('cage-filter-cstatus')?.value  || '';
+
+  let cages = MASTER.cages || [];
+  if (q) cages = cages.filter(c =>
+    (c.name||'').toLowerCase().includes(q) ||
+    (c.location||'').toLowerCase().includes(q) ||
+    (c.vst_area||'').toLowerCase().includes(q) ||
+    ((c.factory?.cage_location)||'').toLowerCase().includes(q)
+  );
+  if (fStatus) cages = cages.filter(c => (c.status||'planned') === fStatus);
+  if (fLoc)    cages = cages.filter(c => (c.location||'facility') === fLoc);
+  if (fCStatus)cages = cages.filter(c => c.cageStatus === fCStatus);
+
+  document.getElementById('cage-count-label').textContent = `${cages.length} cage${cages.length!==1?'s':''}`;
+
+  const tbody = document.getElementById('cage-tbody');
+  if (!cages.length) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">⬡</div><p>No cages match</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = cages.map(c => {
+    const fd = c.factory;
+    const statusCol = statusBadge(c.status);
+    const tagCol    = c.cageStatus === 'red' ? `<span class="badge red">Red</span>`
+                    : c.cageStatus === 'green' ? `<span class="badge green">Green</span>` : '—';
+    return `<tr onclick="toggleCageDetail('${esc(c.id)}',this)">
+      <td class="name">${escHtml(c.name||'')}</td>
+      <td>${escHtml(capitalize(c.location||'facility'))}${c.locationDetail ? `<br><span style="font:400 10px var(--mono);color:var(--text-3)">${escHtml(c.locationDetail)}</span>` : ''}</td>
+      <td>${statusCol}</td>
+      <td>${tagCol}</td>
+      <td class="mono">${escHtml(c.vst_area||'—')}</td>
+      <td class="mono">${c.shifts_required||0}</td>
+      <td class="mono">${c.shifts_completed||0}</td>
+      <td class="mono">${fmtDate(c.departureDate)||'—'}</td>
+      <td class="mono">${fmtDate(c.liveNeedDate)||'—'}</td>
+      <td>${escHtml((fd?.cage_location)||'—')}</td>
+      <td class="mono">${fmtDate(c.intoRmd)||'—'}</td>
+    </tr>
+    <tr class="row-detail" id="detail-${esc(c.id)}">
+      <td colspan="11">${buildCageDetail(c)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleCageDetail(id, clickedRow) {
+  const detail = document.getElementById('detail-' + id);
+  if (!detail) return;
+  detail.classList.toggle('open');
+}
+
+function buildCageDetail(c) {
+  const fd = c.factory || {};
+  const tags = fd.tags   ? Object.entries(fd.tags).filter(([,v])=>v) : [];
+  const cf   = fd.custom_fields ? Object.entries(fd.custom_fields).filter(([,v])=>v!==''&&v!==null&&v!==undefined) : [];
+
+  return `<div class="detail-grid">
+    <div class="detail-section">
+      <div class="detail-section-title">Core</div>
+      ${detailRow('ID', c.id)}
+      ${detailRow('Name', c.name)}
+      ${detailRow('Location', c.location)}
+      ${detailRow('Location Detail', c.locationDetail)}
+      ${detailRow('Cage Status', c.cageStatus||'—')}
+      ${detailRow('Departure', fmtDate(c.departureDate)||'—')}
+      ${detailRow('Live Need', fmtDate(c.liveNeedDate)||'—')}
+      ${detailRow('Into RMD', fmtDate(c.intoRmd)||'—')}
+      ${detailRow('Out of RMD', fmtDate(c.outOfRmd)||'—')}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Programme</div>
+      ${detailRow('VST Area', c.vst_area||'—')}
+      ${detailRow('Status', c.status||'planned')}
+      ${detailRow('Shifts Required', c.shifts_required||0)}
+      ${detailRow('Shifts Completed', c.shifts_completed||0)}
+      ${detailRow('Start Shift', c.start_shift||'—')}
+      ${detailRow('Shipping Pref', c.shippingPreference ? 'Yes' : 'No')}
+      ${detailRow('Proposed Trip', c.proposedTripId||'—')}
+    </div>
+    ${tags.length ? `<div class="detail-section">
+      <div class="detail-section-title">Factory Tags</div>
+      <div class="tag-chips">${tags.map(([k,v])=>
+        `<span class="tag-chip ${v==='done'?'done':''}" title="${escHtml(k)}">${escHtml(k)}</span>`
+      ).join('')}</div>
+    </div>` : ''}
+    ${cf.length ? `<div class="detail-section">
+      <div class="detail-section-title">Custom Fields</div>
+      ${cf.map(([k,v])=>detailRow(k, String(v))).join('')}
+    </div>` : ''}
+    ${fd.cage_location ? `<div class="detail-section">
+      <div class="detail-section-title">Factory Location</div>
+      ${detailRow('Location', fd.cage_location)}
+      ${fd.field_view_link ? `<div style="margin-top:8px"><a href="${escHtml(fd.field_view_link)}" target="_blank"
+        style="color:var(--amber);font:400 11px var(--mono);">Field View Link ↗</a></div>` : ''}
+    </div>` : ''}
+  </div>`;
+}
+
+function detailRow(k, v) {
+  return `<div class="detail-row">
+    <span class="detail-key">${escHtml(k)}</span>
+    <span class="detail-val">${escHtml(String(v??'—'))}</span>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FACTORY
+// ═══════════════════════════════════════════════════════════════════════
+function renderFactory() {
+  if (!MASTER) return;
+  const q = (document.getElementById('factory-search')?.value || '').toLowerCase();
+  const cages = (MASTER.cages || []).filter(c => c.factory);
+  let rows = cages;
+  if (q) rows = rows.filter(c =>
+    (c.name||'').toLowerCase().includes(q) ||
+    (c.factory?.cage_location||'').toLowerCase().includes(q) ||
+    JSON.stringify(c.factory?.tags||{}).toLowerCase().includes(q)
+  );
+
+  document.getElementById('factory-count-label').textContent = `${rows.length} record${rows.length!==1?'s':''}`;
+  const tbody = document.getElementById('factory-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⬡</div><p>No factory data</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(c => {
+    const fd   = c.factory;
+    const tags = Object.entries(fd.tags||{}).filter(([,v])=>v);
+    const cf   = Object.entries(fd.custom_fields||{}).filter(([,v])=>v!==''&&v!==null);
+    const meshes = Object.entries(fd.meshes||{}).filter(([,v])=>v&&v!=='none');
+    return `<tr>
+      <td class="name">${escHtml(c.name||'')}</td>
+      <td>${escHtml(fd.cage_location||'—')}</td>
+      <td>${tags.length ? tags.map(([k])=>`<span class="badge blue" style="margin:1px">${escHtml(k)}</span>`).join('')
+        : '<span style="color:var(--text-3)">—</span>'}</td>
+      <td class="mono" style="font-size:10px">${cf.length ? cf.map(([k,v])=>`${escHtml(k)}: ${escHtml(String(v))}`).join('<br>') : '—'}</td>
+      <td class="mono">${meshes.length ? meshes.map(([m,v])=>`<span class="badge ${v==='blue_red'?'red':'blue'}" style="margin:1px">${escHtml(m)}</span>`).join('') : '—'}</td>
+      <td class="mono">${fmtDate(fd.updated_at)||'—'}</td>
+      <td>${fd.field_view_link ? `<a href="${escHtml(fd.field_view_link)}" target="_blank" style="color:var(--amber);font:400 11px var(--mono);">View ↗</a>` : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SHIPMENTS
+// ═══════════════════════════════════════════════════════════════════════
+function renderShipments() {
+  if (!MASTER) return;
+  const shipments = MASTER.shipments || [];
+  const tbody     = document.getElementById('shipments-tbody');
+  tbody.innerHTML = shipments.length ? shipments.map(s => `<tr>
+    <td class="name">${escHtml(s.reference||s.id||'—')}</td>
+    <td class="mono">${fmtDate(s.date)||'—'}</td>
+    <td>${shipBadge(s.status)}</td>
+    <td>${escHtml(s.destination||'—')}</td>
+    <td style="max-width:240px;font-size:11px">${escHtml(s.notes||'—')}</td>
+  </tr>`).join('') : `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🚢</div><p>No shipments</p></div></td></tr>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BOAT TRIPS
+// ═══════════════════════════════════════════════════════════════════════
+function renderBoatTrips() {
+  if (!MASTER) return;
+  const trips = MASTER.boatTrips || [];
+  const row   = t => `<tr>
+    <td class="name">${escHtml(t.label||t.id||'—')}</td>
+    <td class="mono">${fmtDate(t.loadDate||t.load_date)||'—'}</td>
+    <td class="mono">${fmtDate(t.departDate||t.depart_date)||'—'}</td>
+    <td class="mono">${fmtDate(t.unloadDate||t.unload_date)||'—'}</td>
+    <td class="mono">${fmtDate(t.returnDate||t.return_date)||'—'}</td>
+    <td style="font-size:11px">${escHtml(t.notes||'—')}</td>
+  </tr>`;
+  const html  = trips.length ? trips.map(row).join('')
+    : `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚓</div><p>No boat trips</p></div></td></tr>`;
+  document.getElementById('boattrips-tbody').innerHTML  = html;
+  document.getElementById('boattrips-tbody2').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MOVEMENTS
+// ═══════════════════════════════════════════════════════════════════════
+function renderMovements() {
+  if (!MASTER) return;
+  const q   = (document.getElementById('movement-search')?.value  || '').toLowerCase();
+  const fSt = document.getElementById('movement-filter-status')?.value || '';
+  const cageMap = Object.fromEntries((MASTER.cages||[]).map(c => [c.id, c.name]));
+
+  let mvs = MASTER.plannedMovements || [];
+  if (q)   mvs = mvs.filter(m =>
+    (m.type||'').toLowerCase().includes(q) ||
+    (cageMap[m.cageId]||'').toLowerCase().includes(q) ||
+    (m.from||'').toLowerCase().includes(q) ||
+    (m.to||'').toLowerCase().includes(q) ||
+    (m.notes||'').toLowerCase().includes(q)
+  );
+  if (fSt === 'complete') mvs = mvs.filter(m => m.completedAt);
+  if (fSt === 'pending')  mvs = mvs.filter(m => !m.completedAt);
+
+  document.getElementById('movement-count-label').textContent = `${mvs.length} movement${mvs.length!==1?'s':''}`;
+  const tbody = document.getElementById('movements-tbody');
+  tbody.innerHTML = mvs.length ? mvs.map(m => `<tr>
+    <td class="mono">${fmtDate(m.date)||'—'}</td>
+    <td class="mono">${escHtml(m.shift||'—')}</td>
+    <td>${escHtml(m.type||'—')}</td>
+    <td class="name">${escHtml(cageMap[m.cageId]||m.cageId||'—')}</td>
+    <td>${escHtml(m.from||'—')}</td>
+    <td>${escHtml(m.to||'—')}</td>
+    <td style="font-size:11px;max-width:200px">${escHtml(m.notes||'—')}</td>
+    <td>${m.completedAt ? `<span class="badge green">Done</span>` : `<span class="badge grey">Pending</span>`}</td>
+  </tr>`).join('') : `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📦</div><p>No movements</p></div></td></tr>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ANALYSES
+// ═══════════════════════════════════════════════════════════════════════
+let _analysesColumns = [];
+
+function renderAnalyses() {
+  if (!MASTER) return;
+  const analyses = MASTER.analyses || [];
+  const msgEl    = document.getElementById('analyses-source-msg');
+  const tableWrap= document.getElementById('analyses-table-wrap');
+
+  if (!analyses.length && MASTER.sources?.modelDb?.error?.includes('configured')) {
+    msgEl.classList.remove('hidden');
+    tableWrap.classList.add('hidden');
+    return;
+  }
+  msgEl.classList.add('hidden');
+  tableWrap.classList.remove('hidden');
+
+  if (!analyses.length) {
+    document.getElementById('analyses-thead').innerHTML = '';
+    document.getElementById('analyses-tbody').innerHTML =
+      `<tr><td colspan="1"><div class="empty-state"><div class="empty-icon">⬡</div><p>No analyses data</p></div></td></tr>`;
+    document.getElementById('analyses-count-label').textContent = '0 rows';
     return;
   }
 
-  try {
-    const r = await fetch(`${API_URL}/api/sync`,{
-      method:'POST',
-      headers:{...ah(),'Content-Type':'application/json'},
-      body: JSON.stringify({ accountId, dbUuid }),
-    });
-    if(r.status===401){doLogout();return;}
-    const d = await r.json();
-    if(d.ok){
-      setSyncStatus('ok',
-        `Synced ${d.cageTables} cage tables (${d.cageRows} rows) + ${d.remoteTables} remote tables (${d.remoteRows} rows)`,
-        new Date(d.syncedAt).toLocaleString());
-      setCards(d.cageTables, d.remoteTables, d.cageRows, d.remoteRows, d.syncedAt);
-      loadMeshPreview();
-    } else {
-      setSyncStatus('err','Sync failed: '+(d.error||'unknown'),'');
-    }
-  } catch(e){setSyncStatus('err','Sync error: '+e.message,'');}
-  finally{btn.classList.remove('spinning');}
+  // Determine columns from first row
+  if (!_analysesColumns.length || _analysesColumns.join() !== Object.keys(analyses[0]).join()) {
+    _analysesColumns = Object.keys(analyses[0]);
+  }
+
+  const q = (document.getElementById('analyses-search')?.value || '').toLowerCase();
+  let rows = analyses;
+  if (q) rows = rows.filter(r => Object.values(r).some(v => String(v||'').toLowerCase().includes(q)));
+
+  document.getElementById('analyses-count-label').textContent = `${rows.length} row${rows.length!==1?'s':''}`;
+
+  // Show first 12 columns max to keep table manageable
+  const cols = _analysesColumns.slice(0, 12);
+  document.getElementById('analyses-thead').innerHTML =
+    `<tr>${cols.map(c => `<th>${escHtml(c)}</th>`).join('')}${_analysesColumns.length>12?'<th>…</th>':''}</tr>`;
+  document.getElementById('analyses-tbody').innerHTML = rows.slice(0, 200).map(r =>
+    `<tr>${cols.map(c => `<td class="analyses-col" title="${escHtml(String(r[c]??''))}">${escHtml(shortVal(r[c]))}</td>`).join('')}${_analysesColumns.length>12?'<td>…</td>':''}</tr>`
+  ).join('');
 }
 
-async function loadSyncStatus() {
-  try {
-    const r = await fetch(`${API_URL}/api/sync-status`,{headers:ah()});
-    if(!r.ok)return;
-    const d = await r.json();
-    if(!d.ok||!d.lastSync){setSyncStatus('warn','No sync yet — enter Remote DB credentials in the DB Explorer tab, then click Sync Master','');return;}
-    setSyncStatus('ok',
-      `${d.cageTables} cage tables + ${d.remoteTables} remote tables in master`,
-      'Last sync: '+new Date(d.lastSync).toLocaleString());
-    setCards(d.cageTables, d.remoteTables, d.cageRows||0, d.remoteRows||0, d.lastSync);
-  } catch {}
+function shortVal(v) {
+  if (v === null || v === undefined) return '—';
+  const s = String(v);
+  return s.length > 40 ? s.slice(0, 38) + '…' : s;
 }
 
-function setSyncStatus(state, label, time) {
-  const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label'),tEl=document.getElementById('sync-time');
-  dot.className='sync-dot '+state; lbl.textContent=label; tEl.textContent=time;
+// ═══════════════════════════════════════════════════════════════════════
+// AUDIT LOG
+// ═══════════════════════════════════════════════════════════════════════
+function renderAudit() {
+  if (!MASTER) return;
+  const q = (document.getElementById('audit-search')?.value || '').toLowerCase();
+  let events = MASTER.auditEvents || [];
+  if (q) events = events.filter(e =>
+    (e.type||'').toLowerCase().includes(q) ||
+    (e.description||'').toLowerCase().includes(q) ||
+    (e.detail||'').toLowerCase().includes(q)
+  );
+  document.getElementById('audit-count-label').textContent = `${events.length} event${events.length!==1?'s':''}`;
+  const tbody = document.getElementById('audit-tbody');
+  tbody.innerHTML = events.length ? events.map(e => `<tr>
+    <td class="mono">${fmtDate(e.date||e.timestamp)||'—'}</td>
+    <td>${badgeForType(e.type)}</td>
+    <td>${escHtml(e.description||'—')}</td>
+    <td style="font-size:11px;max-width:260px;color:var(--text-3)">${escHtml(e.detail||'—')}</td>
+  </tr>`).join('') : `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📋</div><p>No audit events match</p></div></td></tr>`;
 }
 
-function setCards(cageTbls, remoteTbls, cageRows, remoteRows, lastSync) {
-  document.getElementById('master-cards').innerHTML = `
-    <div class="stat-card amber"><div class="stat-label">Cage DB Tables</div><div class="stat-value">${cageTbls??'—'}</div><div class="stat-sub">${cageRows??0} rows synced</div></div>
-    <div class="stat-card green"><div class="stat-label">Remote DB Tables</div><div class="stat-value">${remoteTbls??'—'}</div><div class="stat-sub">${remoteRows??0} rows synced</div></div>
-    <div class="stat-card blue"><div class="stat-label">Last Sync</div><div class="stat-value" style="font-size:14px;line-height:1.4">${lastSync?new Date(lastSync).toLocaleDateString():'—'}</div><div class="stat-sub">${lastSync?new Date(lastSync).toLocaleTimeString():'never'}</div></div>
-  `;
+// ═══════════════════════════════════════════════════════════════════════
+// CONFIG MODAL
+// ═══════════════════════════════════════════════════════════════════════
+function openConfig() {
+  document.getElementById('config-url').value = API_URL;
+  document.getElementById('config-pin').value = API_PIN;
+  document.getElementById('config-modal').classList.remove('hidden');
+}
+function closeConfig() {
+  document.getElementById('config-modal').classList.add('hidden');
+}
+function saveConfig() {
+  const pin = document.getElementById('config-pin').value.trim();
+  if (!pin) return;
+  API_PIN = pin;
+  localStorage.setItem(LS_PIN, pin);
+  closeConfig();
+  loadData();
 }
 
-async function loadMeshPreview() {
-  const el = document.getElementById('mesh-preview');
-  try {
-    const r = await fetch(`${API_URL}/api/mesh-weights`);
-    const d = await r.json();
-    const keys = Object.keys(d.weights||{});
-    if (!keys.length) { el.textContent = 'No mesh weight data yet — sync first.'; return; }
-    el.innerHTML = `<span style="color:var(--t2)">${keys.length} production numbers with mesh weight data.</span>
-      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${keys.slice(0,20).map(k=>`<span style="background:var(--s3);border:1px solid var(--line);border-radius:4px;padding:2px 8px;font:400 10px var(--mono);color:var(--amber)">${esc(k)}</span>`).join('')}${keys.length>20?`<span style="color:var(--t3);font-size:10px;padding:2px 6px">+${keys.length-20} more</span>`:''}</div>`;
-  } catch(e) { el.textContent = 'Could not load mesh weights: '+e.message; }
+// ═══════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function esc(s) { return String(s||'').replace(/[^a-zA-Z0-9_-]/g,'_'); }
+
+function fmtDate(d) {
+  if (!d) return '';
+  const parsed = new Date(d);
+  if (isNaN(parsed)) return d;
+  // If it looks like a date-only string keep it as-is for readability
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  return parsed.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
 }
 
-// ── DB Explorer ───────────────────────────────────────────────────────
-function setDbTarget(t) {
-  _dbTgt = t;
-  ['cage','armf','remote'].forEach(id => document.getElementById('dbtab-'+id).classList.toggle('active', id===t));
-  document.getElementById('remote-creds').classList.toggle('show', t==='remote');
-  clearResults();
-  document.getElementById('tables-list').innerHTML = '<div class="db-empty" style="height:80px"><p>—</p></div>';
-  document.getElementById('table-count').textContent = '—';
-  if (t !== 'remote') loadTables();
+function capitalize(s) {
+  return String(s||'').replace(/-/g,' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
-function saveRemoteCreds(){localStorage.setItem('armf_remote_account',document.getElementById('cred-account-id').value.trim());localStorage.setItem('armf_remote_uuid',document.getElementById('cred-db-uuid').value.trim());}
-function loadRemoteCreds(){const a=localStorage.getItem('armf_remote_account')||'';const u=localStorage.getItem('armf_remote_uuid')||'';document.getElementById('cred-account-id').value=a;document.getElementById('cred-db-uuid').value=u;}
-function getRC(){return{accountId:document.getElementById('cred-account-id').value.trim(),dbUuid:document.getElementById('cred-db-uuid').value.trim()};}
-
-async function loadTables() {
-  const listEl = document.getElementById('tables-list');
-  listEl.innerHTML = '<div class="db-empty" style="height:80px"><div class="spinner" style="margin:auto"></div></div>';
-  try {
-    let data;
-    if (_dbTgt==='remote') {
-      const {accountId,dbUuid}=getRC();
-      if (!accountId||!dbUuid){listEl.innerHTML='<div style="padding:10px;font:400 11px var(--mono);color:var(--t3)">Enter Account ID and UUID, then click Connect.</div>';return;}
-      const r=await fetch(`${API_URL}/api/remote-db/tables`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({accountId,dbUuid})});
-      data=await r.json();
-    } else if (_dbTgt==='armf') {
-      const r=await fetch(`${API_URL}/api/armf-db/tables`,{headers:ah()});
-      data=await r.json();
-    } else {
-      const r=await fetch(`${API_URL}/api/cage-db/tables`,{headers:ah()});
-      data=await r.json();
-    }
-    if (!data.ok) throw new Error(data.error||'Failed');
-    const tables=data.tables||[];
-    document.getElementById('table-count').textContent=tables.length;
-    if (!tables.length){listEl.innerHTML='<div class="db-empty" style="height:80px"><p>No tables found.</p></div>';return;}
-    listEl.innerHTML=tables.map(t=>`
-      <div class="db-table-item" id="tbl-${CSS.escape(t.name)}" onclick="selectTable('${t.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
-        <span style="color:var(--t3);font-size:10px">▤</span>
-        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</span>
-        ${t.rows!==null?`<span class="db-table-item-rows">${t.rows}</span>`:''}
-      </div>`).join('');
-  } catch(e){listEl.innerHTML=`<div style="padding:10px;font:400 11px var(--mono);color:var(--red)">Error: ${esc(e.message)}</div>`;document.getElementById('table-count').textContent='!';}
+function statusBadge(s) {
+  const map = {
+    planned:    'grey',
+    'in-progress': 'amber',
+    'in-transit':  'amber',
+    complete:   'green',
+    completed:  'green',
+    shipped:    'blue',
+    cancelled:  'red',
+    delivered:  'purple',
+  };
+  const color = map[s] || 'grey';
+  return `<span class="badge ${color}">${escHtml(capitalize(s||'planned'))}</span>`;
 }
 
-function selectTable(name){
-  document.querySelectorAll('.db-table-item').forEach(e=>e.classList.remove('active'));
-  const el=document.getElementById('tbl-'+CSS.escape(name));if(el)el.classList.add('active');
-  document.getElementById('query-input').value=`SELECT * FROM "${name}" LIMIT 500`;
-  runQuery();
+function shipBadge(s) {
+  const map = { 'in-transit':'amber', delivered:'green', complete:'green', cancelled:'red' };
+  return `<span class="badge ${map[s]||'grey'}">${escHtml(capitalize(s||'—'))}</span>`;
 }
 
-async function runQuery(){
-  const sql=document.getElementById('query-input').value.trim();if(!sql)return;
-  showLoading();
-  const t0=performance.now();
-  try{
-    let data;
-    if(_dbTgt==='remote'){
-      const{accountId,dbUuid}=getRC();if(!accountId||!dbUuid){showError('Enter Account ID and UUID first.');return;}
-      const r=await fetch(`${API_URL}/api/remote-db/query`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({accountId,dbUuid,sql})});data=await r.json();
-    } else if(_dbTgt==='armf'){
-      const r=await fetch(`${API_URL}/api/armf-db/query`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({sql})});data=await r.json();
-    } else {
-      const r=await fetch(`${API_URL}/api/cage-db/query`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({sql})});data=await r.json();
-    }
-    _ms=Math.round(performance.now()-t0);
-    if(!data.ok){showError(data.error||'Query failed');return;}
-    _data=data.results||[];_page=0;renderResults();
-  }catch(e){showError(e.message);}
+function badgeForType(t) {
+  const map = { cage:'amber', frame:'blue', movement:'purple', shipment:'green', trip:'blue', downtime:'red', construction:'amber' };
+  const color = Object.entries(map).find(([k]) => (t||'').toLowerCase().includes(k))?.[1] || 'grey';
+  return `<span class="badge ${color}">${escHtml(t||'—')}</span>`;
 }
 
-function renderResults(){
-  const wrap=document.getElementById('results-wrap'),meta=document.getElementById('results-meta'),pg=document.getElementById('pagination'),exp=document.getElementById('export-btn');
-  if(!_data.length){wrap.innerHTML='<div class="db-empty"><div class="db-empty-icon">⬡</div><p>No rows returned.</p></div>';meta.classList.add('hidden');pg.style.display='none';exp.classList.add('hidden');return;}
-  const totalPgs=Math.ceil(_data.length/PAGE_SZ),start=_page*PAGE_SZ,end=Math.min(start+PAGE_SZ,_data.length),rows=_data.slice(start,end),cols=Object.keys(_data[0]);
-  meta.classList.remove('hidden');meta.textContent=`${_data.length} row${_data.length!==1?'s':''} · ${cols.length} col${cols.length!==1?'s':''} · ${_ms}ms`;
-  exp.classList.remove('hidden');
-  wrap.innerHTML=`<table><thead><tr>${cols.map(c=>`<th title="${esc(c)}">${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${cols.map(c=>{const v=row[c];if(v===null||v===undefined)return`<td class="null-val">NULL</td>`;const s=String(v);return`<td title="${esc(s)}">${esc(s.length>120?s.slice(0,118)+'…':s)}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
-  if(totalPgs>1){pg.style.display='flex';document.getElementById('page-info').textContent=`Page ${_page+1} of ${totalPgs}`;document.getElementById('page-range').textContent=`${start+1}–${end} of ${_data.length}`;document.getElementById('prev-btn').disabled=_page===0;document.getElementById('next-btn').disabled=_page>=totalPgs-1;}else pg.style.display='none';
-}
+// Close config modal on overlay click
+document.getElementById('config-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfig();
+});
 
-function changePage(d){const tp=Math.ceil(_data.length/PAGE_SZ);_page=Math.max(0,Math.min(_page+d,tp-1));renderResults();}
-
-function exportCSV(){if(!_data.length)return;const cols=Object.keys(_data[0]);const csv=[cols.map(cvC).join(','),..._data.map(r=>cols.map(c=>cvC(r[c])).join(','))].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`armf_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`;a.click();}
-function cvC(v){if(v===null||v===undefined)return'';const s=String(v);return s.includes(',')||s.includes('"')||s.includes('\n')?`"${s.replace(/"/g,'""')}"`:s;}
-
-function showLoading(){document.getElementById('results-wrap').innerHTML='<div class="db-loading"><div class="spinner"></div>Running…</div>';document.getElementById('results-meta').classList.add('hidden');document.getElementById('pagination').style.display='none';document.getElementById('export-btn').classList.add('hidden');}
-function showError(m){document.getElementById('results-wrap').innerHTML=`<div class="db-error-msg">${esc(m)}</div>`;document.getElementById('results-meta').classList.add('hidden');document.getElementById('pagination').style.display='none';document.getElementById('export-btn').classList.add('hidden');}
-function clearResults(){document.getElementById('results-wrap').innerHTML='<div class="db-empty"><div class="db-empty-icon">⬡</div><p>Select a table or run a SQL query.</p></div>';document.getElementById('results-meta').classList.add('hidden');document.getElementById('pagination').style.display='none';document.getElementById('export-btn').classList.add('hidden');_data=[];_page=0;}
-function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// Enter key on auth
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeConfig();
+});
 </script>
 </body>
 </html>
