@@ -389,14 +389,7 @@ tbody td.mono{font:400 11px var(--mono);}
     <div class="auth-title">ARMF Viewer</div>
     <div class="auth-sub">Master Database — Read Only</div>
 
-    <label class="form-label" style="text-align:left;display:block;margin-bottom:4px;margin-top:16px;">API Endpoint</label>
-    <div class="auth-api-row">
-      <input class="auth-api-input" id="auth-api-url" type="url"
-        placeholder="https://armf-viewer.your-worker.workers.dev"
-        autocomplete="off">
-    </div>
-
-    <input class="auth-input" id="auth-pin" type="password"
+    <input class="auth-input" id="auth-pin" type="password" style="margin-top:20px;"
       placeholder="• • • • • •" maxlength="20" autocomplete="off"
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="auth-btn" onclick="doLogin()">Connect</button>
@@ -688,9 +681,7 @@ tbody td.mono{font:400 11px var(--mono);}
 <div class="modal-overlay hidden" id="config-modal">
   <div class="modal">
     <div class="modal-title">Connection Settings</div>
-    <div class="modal-sub">Update the ARMF worker endpoint and PIN</div>
-    <label class="form-label">ARMF Worker URL</label>
-    <input class="form-input" id="config-url" type="url" placeholder="https://…workers.dev">
+    <div class="modal-sub">Update your ARMF access PIN</div>
     <label class="form-label">ARMF PIN</label>
     <input class="form-input" id="config-pin" type="password" placeholder="Enter PIN">
     <div class="modal-footer">
@@ -704,12 +695,11 @@ tbody td.mono{font:400 11px var(--mono);}
 // ═══════════════════════════════════════════════════════════════════════
 // CONFIG / STATE
 // ═══════════════════════════════════════════════════════════════════════
-const LS_URL = 'armf_api_url';
-const LS_PIN = 'armf_pin';
+const API_URL = 'https://armf-viewer.exposurephotographer0.workers.dev';
+const LS_PIN  = 'armf_pin';
 
-let API_URL  = '';
-let API_PIN  = '';
-let MASTER   = null;   // last fetched master payload
+let API_PIN = '';
+let MASTER  = null;   // last fetched master payload
 
 function authHeader() {
   return API_PIN ? { 'Authorization': `Bearer ${API_PIN}` } : {};
@@ -719,45 +709,37 @@ function authHeader() {
 // AUTH
 // ═══════════════════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  const savedUrl = localStorage.getItem(LS_URL) || '';
   const savedPin = localStorage.getItem(LS_PIN) || '';
-  if (savedUrl) document.getElementById('auth-api-url').value = savedUrl;
-  if (savedUrl && savedPin) {
-    API_URL = savedUrl;
+  if (savedPin) {
     API_PIN = savedPin;
     showApp();
   }
 });
 
 async function doLogin() {
-  const urlEl = document.getElementById('auth-api-url');
   const pinEl = document.getElementById('auth-pin');
   const errEl = document.getElementById('auth-err');
-  const url   = urlEl.value.trim().replace(/\/$/, '');
   const pin   = pinEl.value.trim();
 
   errEl.classList.add('hidden');
-  if (!url) { showErr(errEl, 'Please enter the ARMF Worker URL'); return; }
   if (!pin) { showErr(errEl, 'Please enter the PIN'); return; }
 
   try {
-    const res  = await fetch(`${url}/api/auth`, {
+    const res  = await fetch(`${API_URL}/api/auth`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ pin }),
     });
     const data = await res.json();
     if (data.ok) {
-      API_URL = url;
       API_PIN = pin;
-      localStorage.setItem(LS_URL, url);
       localStorage.setItem(LS_PIN, pin);
       showApp();
     } else {
       showErr(errEl, data.error || 'Incorrect PIN');
     }
   } catch(e) {
-    showErr(errEl, 'Could not reach the ARMF Worker — check the URL');
+    showErr(errEl, 'Could not reach the ARMF Worker — check your network connection');
   }
 }
 
@@ -1289,12 +1271,9 @@ function closeConfig() {
   document.getElementById('config-modal').classList.add('hidden');
 }
 function saveConfig() {
-  const url = document.getElementById('config-url').value.trim().replace(/\/$/, '');
   const pin = document.getElementById('config-pin').value.trim();
-  if (!url || !pin) return;
-  API_URL = url;
+  if (!pin) return;
   API_PIN = pin;
-  localStorage.setItem(LS_URL, url);
   localStorage.setItem(LS_PIN, pin);
   closeConfig();
   loadData();
