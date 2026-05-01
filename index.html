@@ -780,8 +780,7 @@ function renderDiag(d) {
     </div>
     <div class="detail-section">
       <div class="detail-section-title">Connection Tests</div>
-      ${test('Cage API /api/health', d.tests?.cage_health)}
-      ${test('Cage API /api/state', d.tests?.cage_state)}
+      ${test('Cage DB (direct D1 read)', d.tests?.cage_db)}
       ${test('External D1 (analyses)', d.tests?.external_d1)}
       ${test('ARMF Master D1', d.tests?.armf_db)}
     </div>`;
