@@ -440,6 +440,13 @@ tbody td.mono{font:400 11px var(--mono);}
         <path d="M6.5 1v1.5M6.5 10.5V12M1 6.5h1.5M10.5 6.5H12M2.6 2.6l1.1 1.1M9.3 9.3l1.1 1.1M9.3 3.7l-1.1 1.1M3.7 9.3l-1.1 1.1" stroke-linecap="round"/>
       </svg>
     </button>
+    <button class="refresh-btn" onclick="runDiagnostics()" title="Run connection diagnostics" style="padding:6px 10px;">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="6.5" cy="6.5" r="5.5"/>
+        <line x1="6.5" y1="4" x2="6.5" y2="6.5" stroke-linecap="round"/>
+        <circle cx="6.5" cy="9" r="0.6" fill="currentColor"/>
+      </svg>
+    </button>
     <button class="logout-btn" onclick="doLogout()">Sign out</button>
   </div>
 
@@ -701,9 +708,85 @@ tbody td.mono{font:400 11px var(--mono);}
   </div>
 </div>
 
+<!-- ═══════════ DIAGNOSTICS MODAL ═══════════ -->
+<div class="modal-overlay hidden" id="diag-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-title">Connection Diagnostics</div>
+    <div class="modal-sub">Live test of every secret and connection</div>
+    <div id="diag-content" style="margin-top:4px;">
+      <div style="font:400 12px var(--mono);color:var(--text-3);text-align:center;padding:20px">Running tests…</div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn-secondary" onclick="document.getElementById('diag-modal').classList.add('hidden')">Close</button>
+      <button class="btn-primary" onclick="runDiagnostics()">Re-run</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ═══════════════════════════════════════════════════════════════════════
-// CONFIG / STATE
+async function runDiagnostics() {
+  const modal   = document.getElementById('diag-modal');
+  const content = document.getElementById('diag-content');
+  modal.classList.remove('hidden');
+  content.innerHTML = '<div style="font:400 12px var(--mono);color:var(--text-3);text-align:center;padding:20px">Running tests…</div>';
+  try {
+    const res  = await fetch(`${API_URL}/api/diagnostics`, { headers: authHeader() });
+    const data = await res.json();
+    content.innerHTML = renderDiag(data);
+  } catch(e) {
+    content.innerHTML = `<div style="font:400 12px var(--mono);color:var(--red);padding:8px">Failed to reach worker: ${escHtml(e.message)}</div>`;
+  }
+}
+
+function renderDiag(d) {
+  const rows = (obj) => Object.entries(obj).map(([k,v]) => {
+    const isOk  = v === true || v === '(set)' || v === '(using default)';
+    const isErr = v === '(NOT SET)' || v === false;
+    const col   = isOk ? 'var(--green)' : isErr ? 'var(--red)' : 'var(--text-2)';
+    return `<div class="detail-row">
+      <span class="detail-key">${escHtml(k)}</span>
+      <span style="font:600 11px var(--mono);color:${col}">${escHtml(String(v))}</span>
+    </div>`;
+  }).join('');
+
+  const test = (label, t) => {
+    if (!t) return '';
+    const ok  = t.ok === true || (t.status >= 200 && t.status < 300);
+    const col = ok ? 'var(--green)' : 'var(--red)';
+    let detail = '';
+    if (t.error)        detail = `<div style="color:var(--red);margin-top:4px;font-size:10px">${escHtml(t.error)}</div>`;
+    if (t.status)       detail += `<div style="color:var(--text-3);font-size:10px">HTTP ${t.status}</div>`;
+    if (t.bodyPreview)  detail += `<div style="color:var(--text-3);font-size:10px;word-break:break-all;margin-top:2px">${escHtml(t.bodyPreview)}</div>`;
+    if (t.tables)       detail += `<div style="color:var(--text-3);font-size:10px;margin-top:2px">Tables: ${t.tables.join(', ')||'none'}</div>`;
+    if (t.missing)      detail += `<div style="color:var(--red);font-size:10px;margin-top:2px">Missing: ${t.missing.join(', ')}</div>`;
+    if (t.errors?.length) detail += `<div style="color:var(--red);font-size:10px;margin-top:2px">${escHtml(JSON.stringify(t.errors))}</div>`;
+    if (t.skipped)      detail += `<div style="color:var(--amber);font-size:10px;margin-top:2px">Skipped — missing secrets above</div>`;
+    return `<div style="margin-bottom:10px">
+      <div style="font:700 11px var(--mono);color:${col};margin-bottom:3px">
+        ${ok ? '✓' : '✗'} ${escHtml(label)}
+      </div>
+      ${detail}
+    </div>`;
+  };
+
+  return `
+    <div class="detail-section" style="margin-bottom:12px">
+      <div class="detail-section-title">Secrets / Bindings</div>
+      ${rows(d.secrets)}
+      <div class="detail-row">
+        <span class="detail-key">ARMF_DB binding</span>
+        <span style="font:600 11px var(--mono);color:${d.armf_db?'var(--green)':'var(--red)'}">${d.armf_db ? 'Bound' : 'NOT BOUND'}</span>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Connection Tests</div>
+      ${test('Cage API /api/health', d.tests?.cage_health)}
+      ${test('Cage API /api/state', d.tests?.cage_state)}
+      ${test('External D1 (analyses)', d.tests?.external_d1)}
+      ${test('ARMF Master D1', d.tests?.armf_db)}
+    </div>`;
+}
+</script>
 // ═══════════════════════════════════════════════════════════════════════
 const API_URL = 'https://armf-viewer.exposurephotographer0.workers.dev';
 const LS_PIN  = 'armf_pin';
