@@ -10,25 +10,20 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 .hidden{display:none!important;}
-
 :root{
-  --bg:#0d0e11; --s1:#13141a; --s2:#1a1c23; --s3:#22252f; --s4:#2a2e3a;
-  --line:rgba(255,255,255,0.06); --line-mid:rgba(255,255,255,0.11);
-  --t1:#e8eaf0; --t2:#9aa0b4; --t3:#5a6075;
-  --amber:#f0a500; --amber-dim:rgba(240,165,0,0.10); --amber-glow:rgba(240,165,0,0.22);
-  --green:#22c55e; --green-dim:rgba(34,197,94,0.12);
-  --red:#f87171; --red-dim:rgba(248,113,113,0.12);
-  --blue:#60a5fa; --blue-dim:rgba(96,165,250,0.10);
-  --r:8px; --r-lg:14px;
-  --mono:'Space Mono',monospace; --sans:'Syne',sans-serif;
-  --header-h:58px;
+  --bg:#0d0e11;--s1:#13141a;--s2:#1a1c23;--s3:#22252f;--s4:#2a2e3a;
+  --line:rgba(255,255,255,.06);--line-mid:rgba(255,255,255,.11);
+  --t1:#e8eaf0;--t2:#9aa0b4;--t3:#5a6075;
+  --amber:#f0a500;--amber-dim:rgba(240,165,0,.10);--amber-glow:rgba(240,165,0,.22);
+  --green:#22c55e;--green-dim:rgba(34,197,94,.12);
+  --red:#f87171;--red-dim:rgba(248,113,113,.12);
+  --blue:#60a5fa;--blue-dim:rgba(96,165,250,.10);
+  --r:8px;--r-lg:14px;--mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
 }
 html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--sans);overflow:hidden;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px;}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px;}
 
-/* ── Auth ── */
+/* Auth */
 .auth-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);}
 .auth-card{background:var(--s2);border:1px solid var(--line-mid);border-radius:var(--r-lg);padding:40px 44px;width:100%;max-width:380px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.5);}
 .auth-logo{width:52px;height:52px;border-radius:13px;background:linear-gradient(135deg,var(--amber),#c08520);display:flex;align-items:center;justify-content:center;font:800 17px var(--mono);color:#1a0f00;margin:0 auto 18px;box-shadow:0 8px 24px var(--amber-glow);}
@@ -40,27 +35,56 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
 .auth-btn:hover{filter:brightness(1.1);}
 .auth-err{margin-top:10px;font:400 11px var(--mono);color:var(--red);}
 
-/* ── App shell ── */
+/* App shell */
 .app{display:flex;flex-direction:column;height:100%;}
-.header{background:var(--s1);border-bottom:1px solid var(--line);padding:0 20px;height:var(--header-h);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.header{background:var(--s1);border-bottom:1px solid var(--line);padding:0 20px;height:58px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .header-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--amber),#c08520);display:flex;align-items:center;justify-content:center;font:800 10px var(--mono);color:#1a0f00;flex-shrink:0;}
 .header-title{font:800 16px var(--sans);letter-spacing:-.04em;}
 .header-sub{font:400 10px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:1px;}
 .header-spacer{flex:1;}
-.status-pill{font:700 10px var(--mono);padding:3px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-glow);letter-spacing:.05em;text-transform:uppercase;}
-.header-btn{background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:6px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;transition:all .12s;}
-.header-btn:hover{border-color:var(--t2);color:var(--t1);}
+.header-btn{background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:6px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px;}
+.header-btn:hover{border-color:var(--amber);color:var(--amber);}
+.header-btn.spinning svg{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 .logout-btn{background:transparent;border:1px solid var(--line);border-radius:var(--r);padding:6px 12px;color:var(--t3);font:600 11px var(--sans);cursor:pointer;transition:all .12s;}
 .logout-btn:hover{border-color:var(--red);color:var(--red);}
 
-/* ── DB tab toggle ── */
-.db-tabs{display:flex;gap:0;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--s1);flex-shrink:0;}
-.db-tab{flex:1;max-width:160px;padding:7px 12px;border-radius:var(--r);border:1px solid var(--line-mid);background:transparent;color:var(--t3);font:700 11px var(--mono);cursor:pointer;text-align:center;text-transform:uppercase;letter-spacing:.06em;transition:all .15s;}
-.db-tab:first-child{border-radius:var(--r) 0 0 var(--r);border-right:none;}
-.db-tab:last-child{border-radius:0 var(--r) var(--r) 0;}
-.db-tab.active{background:var(--amber-dim);border-color:var(--amber);color:var(--amber);}
+/* Top-level tabs */
+.top-tabs{background:var(--s1);border-bottom:1px solid var(--line);padding:0 20px;display:flex;gap:2px;flex-shrink:0;}
+.top-tab{background:transparent;border:none;border-bottom:2px solid transparent;padding:0 14px;height:44px;color:var(--t3);font:700 12px var(--sans);cursor:pointer;text-transform:uppercase;letter-spacing:.05em;transition:color .15s,border-color .15s;}
+.top-tab:hover{color:var(--t2);}
+.top-tab.active{color:var(--amber);border-bottom-color:var(--amber);}
 
-/* ── DB layout ── */
+/* Panel */
+.panel{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.panel.active{display:flex;}
+
+/* ── Master panel ── */
+.master-scroll{flex:1;overflow-y:auto;padding:24px;}
+.master-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--s2);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;position:relative;overflow:hidden;}
+.stat-label{font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;}
+.stat-value{font:800 34px var(--sans);letter-spacing:-.05em;line-height:1;}
+.stat-sub{font:400 11px var(--mono);color:var(--t3);margin-top:6px;}
+.stat-card.amber .stat-value{color:var(--amber);}
+.stat-card.green .stat-value{color:var(--green);}
+.stat-card.blue  .stat-value{color:var(--blue);}
+.section-title{font:800 14px var(--sans);letter-spacing:-.03em;margin-bottom:12px;}
+.sync-status-box{background:var(--s2);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .3s;}
+.sync-dot.ok{background:var(--green);}
+.sync-dot.err{background:var(--red);}
+.sync-dot.warn{background:var(--amber);}
+.sync-label{font:600 12px var(--sans);color:var(--t2);flex:1;}
+.sync-time{font:400 11px var(--mono);color:var(--t3);}
+
+/* ── DB Explorer panel ── */
+.db-tabs{display:flex;gap:0;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--s1);flex-shrink:0;}
+.db-tab{max-width:160px;flex:0 0 auto;padding:7px 14px;border:1px solid var(--line-mid);background:transparent;color:var(--t3);font:700 11px var(--mono);cursor:pointer;text-align:center;text-transform:uppercase;letter-spacing:.05em;transition:all .15s;}
+.db-tab:first-child{border-radius:var(--r) 0 0 var(--r);}
+.db-tab:last-child{border-radius:0 var(--r) var(--r) 0;}
+.db-tab:not(:first-child){border-left:none;}
+.db-tab.active{background:var(--amber-dim);border-color:var(--amber);color:var(--amber);}
 .db-layout{display:grid;grid-template-columns:220px 1fr;flex:1;overflow:hidden;}
 .db-sidebar{background:var(--s1);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;}
 .db-sidebar-head{padding:10px 12px;border-bottom:1px solid var(--line);flex-shrink:0;}
@@ -70,44 +94,32 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
 .db-table-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .1s;font:400 11px var(--mono);color:var(--t2);}
 .db-table-item:hover{background:var(--s3);}
 .db-table-item.active{background:var(--s3);color:var(--amber);}
-.db-table-item-icon{color:var(--t3);flex-shrink:0;font-size:10px;}
-.db-table-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.db-table-item-rows{font:700 9px var(--mono);color:var(--t3);background:var(--s4);padding:1px 5px;border-radius:4px;flex-shrink:0;}
-
-/* ── Remote creds panel ── */
+.db-table-item-rows{font:700 9px var(--mono);color:var(--t3);background:var(--s4);padding:1px 5px;border-radius:4px;flex-shrink:0;margin-left:auto;}
 .remote-creds{padding:10px 12px;border-bottom:1px solid var(--line);background:var(--s2);flex-shrink:0;display:none;flex-direction:column;gap:6px;}
 .remote-creds.show{display:flex;}
-.remote-creds-label{font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;}
+.cred-label{font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;}
 .cred-input{width:100%;padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:var(--s1);color:var(--t1);font:400 11px var(--mono);outline:none;transition:border-color .2s;}
 .cred-input:focus{border-color:var(--amber);}
 .cred-input::placeholder{color:var(--t3);}
-.connect-btn{width:100%;padding:6px;border-radius:6px;border:1px solid var(--amber);background:var(--amber-dim);color:var(--amber);font:700 10px var(--mono);cursor:pointer;text-transform:uppercase;letter-spacing:.06em;transition:filter .15s;}
+.connect-btn{width:100%;padding:7px;border-radius:6px;border:1px solid var(--amber);background:var(--amber-dim);color:var(--amber);font:700 10px var(--mono);cursor:pointer;text-transform:uppercase;letter-spacing:.06em;}
 .connect-btn:hover{filter:brightness(1.15);}
-
-/* ── Query area ── */
 .db-main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
 .db-toolbar{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-shrink:0;background:var(--s1);}
 .query-input{flex:1;background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:8px 12px;color:var(--t1);font:400 12px var(--mono);outline:none;transition:border-color .2s;}
 .query-input:focus{border-color:var(--amber);}
 .query-input::placeholder{color:var(--t3);}
-.run-btn{background:linear-gradient(135deg,var(--amber),#c08520);border:none;border-radius:var(--r);padding:8px 16px;color:#1a0f00;font:700 12px var(--sans);cursor:pointer;flex-shrink:0;transition:filter .15s;}
+.run-btn{background:linear-gradient(135deg,var(--amber),#c08520);border:none;border-radius:var(--r);padding:8px 16px;color:#1a0f00;font:700 12px var(--sans);cursor:pointer;flex-shrink:0;}
 .run-btn:hover{filter:brightness(1.1);}
-.export-btn{background:transparent;border:1px solid var(--line-mid);border-radius:var(--r);padding:8px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;flex-shrink:0;transition:all .12s;}
-.export-btn:hover{border-color:var(--t2);color:var(--t1);}
-
-/* ── Results ── */
-.db-results-wrap{flex:1;overflow:auto;position:relative;}
+.export-btn{background:transparent;border:1px solid var(--line-mid);border-radius:var(--r);padding:8px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;flex-shrink:0;}
+.export-btn:hover{border-color:var(--t2);}
+.results-wrap{flex:1;overflow:auto;}
+.results-meta{padding:6px 14px;font:400 10px var(--mono);color:var(--t3);border-bottom:1px solid var(--line);background:var(--s1);}
 .db-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--t3);}
 .db-empty-icon{font-size:28px;opacity:.4;}
 .db-empty p{font:400 12px var(--mono);}
-.db-error-msg{padding:16px 20px;font:400 12px var(--mono);color:var(--red);background:var(--red-dim);margin:12px;border-radius:var(--r);}
+.db-error-msg{padding:16px;font:400 12px var(--mono);color:var(--red);background:var(--red-dim);margin:12px;border-radius:var(--r);}
 .db-loading{display:flex;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--t3);font:400 12px var(--mono);}
 .spinner{width:18px;height:18px;border:2px solid var(--s4);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── Results table ── */
-.results-table-wrap{overflow:auto;height:100%;}
-.results-meta{padding:6px 14px;font:400 10px var(--mono);color:var(--t3);border-bottom:1px solid var(--line);background:var(--s1);flex-shrink:0;display:flex;align-items:center;gap:12px;}
 table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono);}
 thead th{background:var(--s2);font:700 9px var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;z-index:1;}
 tbody tr{border-bottom:1px solid var(--line);transition:background .1s;}
@@ -115,10 +127,8 @@ tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--s2);}
 tbody td{padding:7px 12px;color:var(--t2);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 tbody td.null-val{color:var(--t3);font-style:italic;}
-
-/* ── Pagination ── */
-.db-pagination{padding:8px 14px;border-top:1px solid var(--line);background:var(--s1);display:none;align-items:center;gap:8px;flex-shrink:0;}
-.page-btn{background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:5px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;transition:all .12s;}
+.pagination{padding:8px 14px;border-top:1px solid var(--line);background:var(--s1);display:none;align-items:center;gap:8px;flex-shrink:0;}
+.page-btn{background:var(--s3);border:1px solid var(--line-mid);border-radius:var(--r);padding:5px 12px;color:var(--t2);font:600 11px var(--sans);cursor:pointer;}
 .page-btn:hover:not(:disabled){border-color:var(--amber);color:var(--amber);}
 .page-btn:disabled{opacity:.4;cursor:default;}
 .page-info{font:400 11px var(--mono);color:var(--t3);}
@@ -127,12 +137,12 @@ tbody td.null-val{color:var(--t3);font-style:italic;}
 </head>
 <body>
 
-<!-- ── Auth ── -->
+<!-- Auth -->
 <div class="auth-screen" id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">AR</div>
     <div class="auth-title">ARMF Viewer</div>
-    <div class="auth-sub">Database Explorer</div>
+    <div class="auth-sub">Master Database</div>
     <input class="auth-input" id="auth-pin" type="password" placeholder="• • • • • •"
       maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="auth-btn" onclick="doLogin()">Connect</button>
@@ -140,100 +150,136 @@ tbody td.null-val{color:var(--t3);font-style:italic;}
   </div>
 </div>
 
-<!-- ── App ── -->
+<!-- App -->
 <div class="app hidden" id="app">
 
-  <!-- Header -->
   <div class="header">
     <div class="header-mark">AR</div>
     <div>
       <div class="header-title">ARMF Viewer</div>
-      <div class="header-sub">Database Explorer</div>
+      <div class="header-sub">Master Database</div>
     </div>
     <div class="header-spacer"></div>
-    <span class="status-pill" id="db-status-pill">Cage Tool DB</span>
+    <button class="header-btn" id="sync-btn" onclick="doSync()">
+      <svg id="sync-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M1.5 6A4.5 4.5 0 0 1 9 2.4" stroke-linecap="round"/>
+        <path d="M10.5 6A4.5 4.5 0 0 1 3 9.6" stroke-linecap="round"/>
+        <polyline points="9,1 9,3.5 11,3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="3,8.5 1,8.5 1,11" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Sync Master
+    </button>
     <button class="logout-btn" onclick="doLogout()">Sign out</button>
   </div>
 
-  <!-- DB toggle tabs -->
-  <div class="db-tabs">
-    <button class="db-tab active" id="tab-cage" onclick="setTarget('cage')">▤ Cage Tool DB</button>
-    <button class="db-tab"        id="tab-remote" onclick="setTarget('remote')">⇄ Remote DB</button>
+  <!-- Top-level tab bar -->
+  <div class="top-tabs">
+    <button class="top-tab active" id="ttab-master"   onclick="setTopTab('master')">⬡ Master</button>
+    <button class="top-tab"        id="ttab-explorer" onclick="setTopTab('explorer')">▤ DB Explorer</button>
   </div>
 
-  <!-- DB layout -->
-  <div class="db-layout">
+  <!-- ── MASTER PANEL ── -->
+  <div class="panel active" id="panel-master">
+    <div class="master-scroll">
 
-    <!-- Sidebar -->
-    <div class="db-sidebar">
-      <!-- Remote creds (shown when remote tab active) -->
-      <div class="remote-creds" id="remote-creds">
-        <div class="remote-creds-label">Remote Database</div>
-        <input class="cred-input" id="cred-account-id" placeholder="Account ID (32-char hex)"
-          oninput="saveRemoteCreds()" autocomplete="off">
-        <input class="cred-input" id="cred-db-uuid" placeholder="Database UUID"
-          oninput="saveRemoteCreds()" autocomplete="off">
-        <button class="connect-btn" onclick="loadTables()">⇄ Connect</button>
+      <div class="sync-status-box">
+        <div class="sync-dot" id="sync-dot"></div>
+        <div class="sync-label" id="sync-label">Loading sync status…</div>
+        <div class="sync-time" id="sync-time"></div>
       </div>
 
-      <div class="db-sidebar-head">
-        <div class="db-sidebar-label">
-          Tables
-          <span class="db-table-count" id="table-count">—</span>
-        </div>
-      </div>
-      <div class="db-tables-list" id="tables-list">
-        <div class="db-empty" style="height:100px"><p>—</p></div>
-      </div>
-    </div>
+      <div class="master-grid" id="master-cards"></div>
 
-    <!-- Main -->
-    <div class="db-main">
-      <div class="db-toolbar">
-        <input class="query-input" id="query-input"
-          placeholder="SELECT * FROM table_name LIMIT 100"
-          onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey))runQuery()">
-        <button class="run-btn" onclick="runQuery()">▶ Run</button>
-        <button class="export-btn hidden" id="export-btn" onclick="exportCSV()">⬇ CSV</button>
-      </div>
+      <div class="section-title">What the Master DB holds</div>
+      <p style="font:400 12px var(--mono);color:var(--t3);line-height:1.8;margin-bottom:20px">
+        The <strong style="color:var(--amber)">armf-master</strong> D1 database collates data from two sources:<br>
+        <span style="color:var(--t2)">① Cage Tool DB</span> — all cage, frame, movement, shipment, factory and audit data (read via CAGE_DB binding)<br>
+        <span style="color:var(--t2)">② Remote DB</span> — the <code style="color:var(--amber)">analyses</code> table pulled in via the Cloudflare API<br><br>
+        The cage tool and cage traveller apps now read mesh weights and cage refresh data from here instead of syncing the remote DB themselves.
+        Hit <strong style="color:var(--amber)">Sync Master</strong> above to pull the latest analyses from the remote DB.
+      </p>
 
-      <div class="results-meta hidden" id="results-meta"></div>
-
-      <div class="db-results-wrap" id="results-wrap">
-        <div class="db-empty">
-          <div class="db-empty-icon">⬡</div>
-          <p>Select a table or write a SQL query and press ⌘/Ctrl + Enter.</p>
-        </div>
-      </div>
-
-      <div class="db-pagination" id="pagination">
-        <button class="page-btn" id="prev-btn" onclick="changePage(-1)" disabled>← Prev</button>
-        <span class="page-info" id="page-info">Page 1</span>
-        <button class="page-btn" id="next-btn" onclick="changePage(1)">Next →</button>
-        <span class="page-range" id="page-range"></span>
+      <div class="section-title">Mesh Weights Preview</div>
+      <div id="mesh-preview" style="font:400 11px var(--mono);color:var(--t3);padding:12px;background:var(--s2);border:1px solid var(--line);border-radius:var(--r-lg)">
+        Loading…
       </div>
     </div>
   </div>
-</div>
+
+  <!-- ── DB EXPLORER PANEL ── -->
+  <div class="panel" id="panel-explorer">
+
+    <!-- DB source tabs -->
+    <div class="db-tabs">
+      <button class="db-tab active" id="dbtab-cage"   onclick="setDbTarget('cage')">▤ Cage Tool DB</button>
+      <button class="db-tab"        id="dbtab-armf"   onclick="setDbTarget('armf')">⬡ Master DB</button>
+      <button class="db-tab"        id="dbtab-remote" onclick="setDbTarget('remote')">⇄ Remote DB</button>
+    </div>
+
+    <div class="db-layout">
+      <div class="db-sidebar">
+
+        <!-- Remote creds (shown only for remote tab) -->
+        <div class="remote-creds" id="remote-creds">
+          <div class="cred-label">Remote Database</div>
+          <input class="cred-input" id="cred-account-id" placeholder="Account ID (32-char hex)"
+            oninput="saveRemoteCreds()" autocomplete="off">
+          <input class="cred-input" id="cred-db-uuid" placeholder="Database UUID"
+            oninput="saveRemoteCreds()" autocomplete="off">
+          <button class="connect-btn" onclick="loadTables()">⇄ Connect</button>
+        </div>
+
+        <div class="db-sidebar-head">
+          <div class="db-sidebar-label">
+            Tables
+            <span class="db-table-count" id="table-count">—</span>
+          </div>
+        </div>
+        <div class="db-tables-list" id="tables-list">
+          <div class="db-empty" style="height:80px"><p>—</p></div>
+        </div>
+      </div>
+
+      <div class="db-main">
+        <div class="db-toolbar">
+          <input class="query-input" id="query-input" placeholder="SELECT * FROM table_name LIMIT 100"
+            onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey))runQuery()">
+          <button class="run-btn" onclick="runQuery()">▶ Run</button>
+          <button class="export-btn hidden" id="export-btn" onclick="exportCSV()">⬇ CSV</button>
+        </div>
+        <div class="results-meta hidden" id="results-meta"></div>
+        <div class="results-wrap" id="results-wrap">
+          <div class="db-empty"><div class="db-empty-icon">⬡</div><p>Select a table or run a SQL query.</p></div>
+        </div>
+        <div class="pagination" id="pagination">
+          <button class="page-btn" id="prev-btn" onclick="changePage(-1)" disabled>← Prev</button>
+          <span class="page-info" id="page-info"></span>
+          <button class="page-btn" id="next-btn" onclick="changePage(1)">Next →</button>
+          <span class="page-range" id="page-range"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
 
 <script>
-// ── Config ──────────────────────────────────────────────────────────
 const API_URL  = 'https://armf-viewer.exposurephotographer0.workers.dev';
 const LS_PIN   = 'armf_pin';
-const PAGE_SIZE = 200;
+const PAGE_SZ  = 200;
 
 let _pin    = '';
-let _target = 'cage'; // 'cage' | 'remote'
+let _dbTgt  = 'cage';
 let _data   = [];
 let _page   = 0;
 let _ms     = 0;
 
-const authHdr = () => _pin ? { 'Authorization': `Bearer ${_pin}` } : {};
+const ah = () => _pin ? {'Authorization':`Bearer ${_pin}`} : {};
 
-// ── Auth ─────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem(LS_PIN);
-  if (saved) { _pin = saved; showApp(); }
+  const s = localStorage.getItem(LS_PIN);
+  if (s) { _pin = s; showApp(); }
 });
 
 async function doLogin() {
@@ -241,258 +287,185 @@ async function doLogin() {
   const errEl = document.getElementById('auth-err');
   const pin   = pinEl.value.trim();
   errEl.classList.add('hidden');
-  if (!pin) { showAuthErr('Please enter the PIN'); return; }
+  if (!pin) { showAE('Please enter your PIN'); return; }
   try {
-    const res  = await fetch(`${API_URL}/api/auth`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin }),
-    });
-    const data = await res.json();
-    if (data.ok) {
-      _pin = pin;
-      localStorage.setItem(LS_PIN, pin);
-      showApp();
-    } else {
-      showAuthErr(data.error || 'Incorrect PIN');
-    }
-  } catch(e) {
-    showAuthErr('Could not reach the ARMF Worker — check network');
-  }
+    const r = await fetch(`${API_URL}/api/auth`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});
+    const d = await r.json();
+    if (d.ok) { _pin=pin; localStorage.setItem(LS_PIN,pin); showApp(); }
+    else showAE(d.error||'Incorrect PIN');
+  } catch { showAE('Could not reach the ARMF Worker'); }
 }
-
-function showAuthErr(msg) {
-  const el = document.getElementById('auth-err');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-}
-
-function showApp() {
+function showAE(m){const e=document.getElementById('auth-err');e.textContent=m;e.classList.remove('hidden');}
+function showApp(){
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   loadRemoteCreds();
-  loadTables();
+  loadSyncStatus();
+  loadMeshPreview();
+}
+function doLogout(){localStorage.removeItem(LS_PIN);_pin='';document.getElementById('app').classList.add('hidden');document.getElementById('auth-screen').classList.remove('hidden');document.getElementById('auth-pin').value='';}
+
+// ── Top tabs ──────────────────────────────────────────────────────────
+function setTopTab(t) {
+  ['master','explorer'].forEach(id => {
+    document.getElementById('ttab-'+id).classList.toggle('active', id===t);
+    document.getElementById('panel-'+id).classList.toggle('active', id===t);
+  });
+  if (t==='explorer' && _dbTgt==='cage') loadTables();
 }
 
-function doLogout() {
-  localStorage.removeItem(LS_PIN);
-  _pin = '';
-  document.getElementById('app').classList.add('hidden');
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('auth-pin').value = '';
+// ── Sync ──────────────────────────────────────────────────────────────
+async function doSync() {
+  const btn = document.getElementById('sync-btn');
+  btn.classList.add('spinning');
+  setSyncStatus('syncing','Syncing analyses from remote DB…','');
+  try {
+    const r = await fetch(`${API_URL}/api/sync`,{method:'POST',headers:ah()});
+    if (r.status===401){doLogout();return;}
+    const d = await r.json();
+    if (d.ok) {
+      setSyncStatus('ok',`Synced ${d.synced} rows`,new Date(d.syncedAt).toLocaleString());
+      setCards(d.synced,null,null);
+      loadMeshPreview();
+    } else {
+      setSyncStatus('err','Sync failed: '+(d.error||'unknown'),'');
+    }
+  } catch(e) { setSyncStatus('err','Sync error: '+e.message,''); }
+  finally { btn.classList.remove('spinning'); }
 }
 
-// ── DB target toggle ─────────────────────────────────────────────────
-function setTarget(t) {
-  _target = t;
-  document.getElementById('tab-cage').classList.toggle('active',   t === 'cage');
-  document.getElementById('tab-remote').classList.toggle('active', t === 'remote');
-  document.getElementById('remote-creds').classList.toggle('show', t === 'remote');
-  document.getElementById('db-status-pill').textContent = t === 'cage' ? 'Cage Tool DB' : 'Remote DB';
+async function loadSyncStatus() {
+  try {
+    const r = await fetch(`${API_URL}/api/sync-status`,{headers:ah()});
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d.ok) { setSyncStatus('warn','Master DB not yet synced',''); return; }
+    if (!d.lastSync) { setSyncStatus('warn','No sync yet — click Sync Master to populate',''); return; }
+    setSyncStatus('ok',`${d.totalRows} rows (${d.acceptedRows} accepted)`,new Date(d.lastSync).toLocaleString());
+    setCards(d.totalRows, d.acceptedRows, d.lastSync);
+  } catch {}
+}
+
+function setSyncStatus(state, label, time) {
+  const dot   = document.getElementById('sync-dot');
+  const lbl   = document.getElementById('sync-label');
+  const tEl   = document.getElementById('sync-time');
+  dot.className  = 'sync-dot '+state;
+  lbl.textContent = label;
+  tEl.textContent = time;
+}
+
+function setCards(total, accepted, lastSync) {
+  document.getElementById('master-cards').innerHTML = `
+    <div class="stat-card amber"><div class="stat-label">Total Rows</div><div class="stat-value">${total??'—'}</div><div class="stat-sub">in analyses_master</div></div>
+    <div class="stat-card green"><div class="stat-label">Accepted</div><div class="stat-value">${accepted??'—'}</div><div class="stat-sub">status = accepted</div></div>
+    <div class="stat-card blue"><div class="stat-label">Last Sync</div><div class="stat-value" style="font-size:14px;line-height:1.4">${lastSync ? new Date(lastSync).toLocaleDateString() : '—'}</div><div class="stat-sub">${lastSync ? new Date(lastSync).toLocaleTimeString() : 'never'}</div></div>
+  `;
+}
+
+async function loadMeshPreview() {
+  const el = document.getElementById('mesh-preview');
+  try {
+    const r = await fetch(`${API_URL}/api/mesh-weights`);
+    const d = await r.json();
+    const keys = Object.keys(d.weights||{});
+    if (!keys.length) { el.textContent = 'No mesh weight data yet — sync first.'; return; }
+    el.innerHTML = `<span style="color:var(--t2)">${keys.length} production numbers with mesh weight data.</span>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${keys.slice(0,20).map(k=>`<span style="background:var(--s3);border:1px solid var(--line);border-radius:4px;padding:2px 8px;font:400 10px var(--mono);color:var(--amber)">${esc(k)}</span>`).join('')}${keys.length>20?`<span style="color:var(--t3);font-size:10px;padding:2px 6px">+${keys.length-20} more</span>`:''}</div>`;
+  } catch(e) { el.textContent = 'Could not load mesh weights: '+e.message; }
+}
+
+// ── DB Explorer ───────────────────────────────────────────────────────
+function setDbTarget(t) {
+  _dbTgt = t;
+  ['cage','armf','remote'].forEach(id => document.getElementById('dbtab-'+id).classList.toggle('active', id===t));
+  document.getElementById('remote-creds').classList.toggle('show', t==='remote');
   clearResults();
   document.getElementById('tables-list').innerHTML = '<div class="db-empty" style="height:80px"><p>—</p></div>';
   document.getElementById('table-count').textContent = '—';
-  if (t === 'cage') loadTables();
+  if (t !== 'remote') loadTables();
 }
 
-// ── Remote creds ─────────────────────────────────────────────────────
-function saveRemoteCreds() {
-  localStorage.setItem('armf_remote_account', document.getElementById('cred-account-id').value.trim());
-  localStorage.setItem('armf_remote_uuid',    document.getElementById('cred-db-uuid').value.trim());
-}
-function loadRemoteCreds() {
-  const a = localStorage.getItem('armf_remote_account') || '';
-  const u = localStorage.getItem('armf_remote_uuid')    || '';
-  document.getElementById('cred-account-id').value = a;
-  document.getElementById('cred-db-uuid').value    = u;
-}
-function getRemoteCreds() {
-  return {
-    accountId: document.getElementById('cred-account-id').value.trim(),
-    dbUuid:    document.getElementById('cred-db-uuid').value.trim(),
-  };
-}
+function saveRemoteCreds(){localStorage.setItem('armf_remote_account',document.getElementById('cred-account-id').value.trim());localStorage.setItem('armf_remote_uuid',document.getElementById('cred-db-uuid').value.trim());}
+function loadRemoteCreds(){const a=localStorage.getItem('armf_remote_account')||'';const u=localStorage.getItem('armf_remote_uuid')||'';document.getElementById('cred-account-id').value=a;document.getElementById('cred-db-uuid').value=u;}
+function getRC(){return{accountId:document.getElementById('cred-account-id').value.trim(),dbUuid:document.getElementById('cred-db-uuid').value.trim()};}
 
-// ── Load tables ───────────────────────────────────────────────────────
 async function loadTables() {
   const listEl = document.getElementById('tables-list');
   listEl.innerHTML = '<div class="db-empty" style="height:80px"><div class="spinner" style="margin:auto"></div></div>';
-
   try {
     let data;
-    if (_target === 'remote') {
-      const { accountId, dbUuid } = getRemoteCreds();
-      if (!accountId || !dbUuid) {
-        listEl.innerHTML = '<div style="padding:10px;font:400 11px var(--mono);color:var(--t3)">Enter Account ID and UUID above, then click Connect.</div>';
-        return;
-      }
-      const res = await fetch(`${API_URL}/api/remote-db/tables`, {
-        method: 'POST', headers: { ...authHdr(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountId, dbUuid }),
-      });
-      data = await res.json();
+    if (_dbTgt==='remote') {
+      const {accountId,dbUuid}=getRC();
+      if (!accountId||!dbUuid){listEl.innerHTML='<div style="padding:10px;font:400 11px var(--mono);color:var(--t3)">Enter Account ID and UUID, then click Connect.</div>';return;}
+      const r=await fetch(`${API_URL}/api/remote-db/tables`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({accountId,dbUuid})});
+      data=await r.json();
+    } else if (_dbTgt==='armf') {
+      const r=await fetch(`${API_URL}/api/armf-db/tables`,{headers:ah()});
+      data=await r.json();
     } else {
-      const res = await fetch(`${API_URL}/api/cage-db/tables`, { headers: authHdr() });
-      data = await res.json();
+      const r=await fetch(`${API_URL}/api/cage-db/tables`,{headers:ah()});
+      data=await r.json();
     }
-
-    if (!data.ok) throw new Error(data.error || 'Failed');
-    const tables = data.tables || [];
-    document.getElementById('table-count').textContent = tables.length;
-    if (!tables.length) {
-      listEl.innerHTML = '<div class="db-empty" style="height:80px"><p>No tables found.</p></div>';
-      return;
-    }
-    listEl.innerHTML = tables.map(t => `
+    if (!data.ok) throw new Error(data.error||'Failed');
+    const tables=data.tables||[];
+    document.getElementById('table-count').textContent=tables.length;
+    if (!tables.length){listEl.innerHTML='<div class="db-empty" style="height:80px"><p>No tables found.</p></div>';return;}
+    listEl.innerHTML=tables.map(t=>`
       <div class="db-table-item" id="tbl-${CSS.escape(t.name)}" onclick="selectTable('${t.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
-        <span class="db-table-item-icon">▤</span>
-        <span class="db-table-item-name">${esc(t.name)}</span>
-        ${t.rows !== null ? `<span class="db-table-item-rows">${t.rows}</span>` : ''}
+        <span style="color:var(--t3);font-size:10px">▤</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</span>
+        ${t.rows!==null?`<span class="db-table-item-rows">${t.rows}</span>`:''}
       </div>`).join('');
-  } catch(e) {
-    listEl.innerHTML = `<div style="padding:10px;font:400 11px var(--mono);color:var(--red)">Error: ${esc(e.message)}</div>`;
-    document.getElementById('table-count').textContent = '!';
-  }
+  } catch(e){listEl.innerHTML=`<div style="padding:10px;font:400 11px var(--mono);color:var(--red)">Error: ${esc(e.message)}</div>`;document.getElementById('table-count').textContent='!';}
 }
 
-function selectTable(name) {
-  document.querySelectorAll('.db-table-item').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('tbl-' + CSS.escape(name));
-  if (el) el.classList.add('active');
-  document.getElementById('query-input').value = `SELECT * FROM "${name}" LIMIT 500`;
+function selectTable(name){
+  document.querySelectorAll('.db-table-item').forEach(e=>e.classList.remove('active'));
+  const el=document.getElementById('tbl-'+CSS.escape(name));if(el)el.classList.add('active');
+  document.getElementById('query-input').value=`SELECT * FROM "${name}" LIMIT 500`;
   runQuery();
 }
 
-// ── Run query ─────────────────────────────────────────────────────────
-async function runQuery() {
-  const sql = document.getElementById('query-input').value.trim();
-  if (!sql) return;
-
+async function runQuery(){
+  const sql=document.getElementById('query-input').value.trim();if(!sql)return;
   showLoading();
-  const t0 = performance.now();
-  try {
+  const t0=performance.now();
+  try{
     let data;
-    if (_target === 'remote') {
-      const { accountId, dbUuid } = getRemoteCreds();
-      if (!accountId || !dbUuid) { showError('Enter Account ID and Database UUID in the sidebar first.'); return; }
-      const res = await fetch(`${API_URL}/api/remote-db/query`, {
-        method: 'POST', headers: { ...authHdr(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountId, dbUuid, sql }),
-      });
-      data = await res.json();
+    if(_dbTgt==='remote'){
+      const{accountId,dbUuid}=getRC();if(!accountId||!dbUuid){showError('Enter Account ID and UUID first.');return;}
+      const r=await fetch(`${API_URL}/api/remote-db/query`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({accountId,dbUuid,sql})});data=await r.json();
+    } else if(_dbTgt==='armf'){
+      const r=await fetch(`${API_URL}/api/armf-db/query`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({sql})});data=await r.json();
     } else {
-      const res = await fetch(`${API_URL}/api/cage-db/query`, {
-        method: 'POST', headers: { ...authHdr(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sql }),
-      });
-      data = await res.json();
+      const r=await fetch(`${API_URL}/api/cage-db/query`,{method:'POST',headers:{...ah(),'Content-Type':'application/json'},body:JSON.stringify({sql})});data=await r.json();
     }
-    _ms = Math.round(performance.now() - t0);
-    if (!data.ok) { showError(data.error || 'Query failed'); return; }
-    _data = data.results || [];
-    _page = 0;
-    renderResults();
-  } catch(e) {
-    showError(e.message);
-  }
+    _ms=Math.round(performance.now()-t0);
+    if(!data.ok){showError(data.error||'Query failed');return;}
+    _data=data.results||[];_page=0;renderResults();
+  }catch(e){showError(e.message);}
 }
 
-// ── Render results ────────────────────────────────────────────────────
-function renderResults() {
-  const wrap  = document.getElementById('results-wrap');
-  const meta  = document.getElementById('results-meta');
-  const pgEl  = document.getElementById('pagination');
-  const expEl = document.getElementById('export-btn');
-
-  if (!_data.length) {
-    wrap.innerHTML = '<div class="db-empty"><div class="db-empty-icon">⬡</div><p>Query returned no rows.</p></div>';
-    meta.classList.add('hidden');
-    pgEl.style.display = 'none';
-    expEl.classList.add('hidden');
-    return;
-  }
-
-  const totalPages = Math.ceil(_data.length / PAGE_SIZE);
-  const start = _page * PAGE_SIZE, end = Math.min(start + PAGE_SIZE, _data.length);
-  const rows  = _data.slice(start, end);
-  const cols  = Object.keys(_data[0]);
-
-  meta.classList.remove('hidden');
-  meta.textContent = `${_data.length} row${_data.length !== 1 ? 's' : ''} · ${cols.length} col${cols.length !== 1 ? 's' : ''} · ${_ms}ms`;
-
-  expEl.classList.remove('hidden');
-
-  wrap.innerHTML = `<div class="results-table-wrap">
-    <table>
-      <thead><tr>${cols.map(c => `<th title="${esc(c)}">${esc(c)}</th>`).join('')}</tr></thead>
-      <tbody>${rows.map(row =>
-        `<tr>${cols.map(c => {
-          const v = row[c];
-          if (v === null || v === undefined) return `<td class="null-val">NULL</td>`;
-          const s = String(v);
-          return `<td title="${esc(s)}">${esc(s.length > 120 ? s.slice(0,118)+'…' : s)}</td>`;
-        }).join('')}</tr>`
-      ).join('')}</tbody>
-    </table>
-  </div>`;
-
-  if (totalPages > 1) {
-    pgEl.style.display = 'flex';
-    document.getElementById('page-info').textContent = `Page ${_page + 1} of ${totalPages}`;
-    document.getElementById('page-range').textContent = `Rows ${start + 1}–${end} of ${_data.length}`;
-    document.getElementById('prev-btn').disabled = _page === 0;
-    document.getElementById('next-btn').disabled = _page >= totalPages - 1;
-  } else {
-    pgEl.style.display = 'none';
-  }
+function renderResults(){
+  const wrap=document.getElementById('results-wrap'),meta=document.getElementById('results-meta'),pg=document.getElementById('pagination'),exp=document.getElementById('export-btn');
+  if(!_data.length){wrap.innerHTML='<div class="db-empty"><div class="db-empty-icon">⬡</div><p>No rows returned.</p></div>';meta.classList.add('hidden');pg.style.display='none';exp.classList.add('hidden');return;}
+  const totalPgs=Math.ceil(_data.length/PAGE_SZ),start=_page*PAGE_SZ,end=Math.min(start+PAGE_SZ,_data.length),rows=_data.slice(start,end),cols=Object.keys(_data[0]);
+  meta.classList.remove('hidden');meta.textContent=`${_data.length} row${_data.length!==1?'s':''} · ${cols.length} col${cols.length!==1?'s':''} · ${_ms}ms`;
+  exp.classList.remove('hidden');
+  wrap.innerHTML=`<table><thead><tr>${cols.map(c=>`<th title="${esc(c)}">${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${cols.map(c=>{const v=row[c];if(v===null||v===undefined)return`<td class="null-val">NULL</td>`;const s=String(v);return`<td title="${esc(s)}">${esc(s.length>120?s.slice(0,118)+'…':s)}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
+  if(totalPgs>1){pg.style.display='flex';document.getElementById('page-info').textContent=`Page ${_page+1} of ${totalPgs}`;document.getElementById('page-range').textContent=`${start+1}–${end} of ${_data.length}`;document.getElementById('prev-btn').disabled=_page===0;document.getElementById('next-btn').disabled=_page>=totalPgs-1;}else pg.style.display='none';
 }
 
-function changePage(delta) {
-  const totalPages = Math.ceil(_data.length / PAGE_SIZE);
-  _page = Math.max(0, Math.min(_page + delta, totalPages - 1));
-  renderResults();
-}
+function changePage(d){const tp=Math.ceil(_data.length/PAGE_SZ);_page=Math.max(0,Math.min(_page+d,tp-1));renderResults();}
 
-// ── Export CSV ────────────────────────────────────────────────────────
-function exportCSV() {
-  if (!_data.length) return;
-  const cols = Object.keys(_data[0]);
-  const csvRows = [cols.map(csvCell).join(',')];
-  _data.forEach(row => csvRows.push(cols.map(c => csvCell(row[c])).join(',')));
-  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `armf_export_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`;
-  a.click();
-}
-function csvCell(v) {
-  if (v === null || v === undefined) return '';
-  const s = String(v);
-  return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g,'""')}"` : s;
-}
+function exportCSV(){if(!_data.length)return;const cols=Object.keys(_data[0]);const csv=[cols.map(cvC).join(','),..._data.map(r=>cols.map(c=>cvC(r[c])).join(','))].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`armf_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`;a.click();}
+function cvC(v){if(v===null||v===undefined)return'';const s=String(v);return s.includes(',')||s.includes('"')||s.includes('\n')?`"${s.replace(/"/g,'""')}"`:s;}
 
-// ── UI helpers ────────────────────────────────────────────────────────
-function showLoading() {
-  document.getElementById('results-wrap').innerHTML = '<div class="db-loading"><div class="spinner"></div>Running query…</div>';
-  document.getElementById('results-meta').classList.add('hidden');
-  document.getElementById('pagination').style.display = 'none';
-  document.getElementById('export-btn').classList.add('hidden');
-}
-function showError(msg) {
-  document.getElementById('results-wrap').innerHTML = `<div class="db-error-msg">${esc(msg)}</div>`;
-  document.getElementById('results-meta').classList.add('hidden');
-  document.getElementById('pagination').style.display = 'none';
-  document.getElementById('export-btn').classList.add('hidden');
-}
-function clearResults() {
-  document.getElementById('results-wrap').innerHTML = '<div class="db-empty"><div class="db-empty-icon">⬡</div><p>Select a table or write a SQL query and press ⌘/Ctrl + Enter.</p></div>';
-  document.getElementById('results-meta').classList.add('hidden');
-  document.getElementById('pagination').style.display = 'none';
-  document.getElementById('export-btn').classList.add('hidden');
-  _data = []; _page = 0;
-}
-function esc(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function showLoading(){document.getElementById('results-wrap').innerHTML='<div class="db-loading"><div class="spinner"></div>Running…</div>';document.getElementById('results-meta').classList.add('hidden');document.getElementById('pagination').style.display='none';document.getElementById('export-btn').classList.add('hidden');}
+function showError(m){document.getElementById('results-wrap').innerHTML=`<div class="db-error-msg">${esc(m)}</div>`;document.getElementById('results-meta').classList.add('hidden');document.getElementById('pagination').style.display='none';document.getElementById('export-btn').classList.add('hidden');}
+function clearResults(){document.getElementById('results-wrap').innerHTML='<div class="db-empty"><div class="db-empty-icon">⬡</div><p>Select a table or run a SQL query.</p></div>';document.getElementById('results-meta').classList.add('hidden');document.getElementById('pagination').style.display='none';document.getElementById('export-btn').classList.add('hidden');_data=[];_page=0;}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
 </body>
 </html>
