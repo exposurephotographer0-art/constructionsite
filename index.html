@@ -424,6 +424,16 @@ tbody td.mono{font:400 11px var(--mono);}
       </svg>
       Refresh
     </button>
+    <button class="refresh-btn" id="sync-btn" onclick="doSync()" title="Pull latest data from all sources into the master database">
+      <svg id="sync-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M1.5 6A4.5 4.5 0 0 1 9 2.4" stroke-linecap="round"/>
+        <path d="M10.5 6A4.5 4.5 0 0 1 3 9.6" stroke-linecap="round"/>
+        <polyline points="9,1 9,3.5 11,3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="3,8.5 1,8.5 1,11" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Sync
+    </button>
+    <span class="fetch-time" id="sync-time"></span>
     <button class="refresh-btn" onclick="openConfig()" title="Settings" style="padding:6px 10px;">
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4">
         <circle cx="6.5" cy="6.5" r="2"/>
@@ -770,28 +780,62 @@ async function loadData() {
   const loadEl = document.getElementById('loading-overlay');
   const msgEl  = document.getElementById('loading-msg');
   const btn    = document.getElementById('refresh-btn');
-  const icon   = document.getElementById('refresh-icon');
 
   loadEl.classList.remove('hidden');
   btn.classList.add('spinning');
-  msgEl.textContent = 'Fetching master database…';
+  msgEl.textContent = 'Reading master database…';
 
   try {
-    const res  = await fetch(`${API_URL}/api/master`, { headers: authHeader() });
+    const res = await fetch(`${API_URL}/api/master`, { headers: authHeader() });
     if (res.status === 401) { doLogout(); return; }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     MASTER = await res.json();
     renderAll();
     setApiDot('ok');
+    const t = MASTER.syncedAt || MASTER.fetchedAt;
     document.getElementById('fetch-time').textContent =
-      'as of ' + new Date(MASTER.fetchedAt).toLocaleTimeString();
+      t ? ('synced ' + new Date(t).toLocaleTimeString()) : '';
   } catch(e) {
     setApiDot('err');
-    document.getElementById('fetch-time').textContent = 'fetch error';
+    document.getElementById('fetch-time').textContent = 'read error';
     console.error('loadData error:', e);
   } finally {
     loadEl.classList.add('hidden');
     btn.classList.remove('spinning');
+  }
+}
+
+async function doSync() {
+  const btn     = document.getElementById('sync-btn');
+  const timeEl  = document.getElementById('sync-time');
+  const loadEl  = document.getElementById('loading-overlay');
+  const msgEl   = document.getElementById('loading-msg');
+
+  btn.classList.add('spinning');
+  loadEl.classList.remove('hidden');
+  msgEl.textContent = 'Syncing from all sources…';
+  timeEl.textContent = 'syncing…';
+
+  try {
+    const res  = await fetch(`${API_URL}/api/sync`, {
+      method: 'POST', headers: authHeader(),
+    });
+    if (res.status === 401) { doLogout(); return; }
+    const data = await res.json();
+    if (data.ok) {
+      timeEl.textContent = 'synced ' + new Date(data.syncedAt).toLocaleTimeString();
+      // Reload from DB now that it's fresh
+      await loadData();
+    } else {
+      timeEl.textContent = 'sync error';
+      console.error('Sync error:', data);
+    }
+  } catch(e) {
+    timeEl.textContent = 'sync failed';
+    console.error('doSync error:', e);
+  } finally {
+    btn.classList.remove('spinning');
+    loadEl.classList.add('hidden');
   }
 }
 
